@@ -103,8 +103,8 @@ service cloud.firestore {
           incoming().uid == existing().uid &&
           incoming().availableBalance + incoming().reservedBalance == existing().availableBalance + existing().reservedBalance &&
           incoming().availableBalance < existing().availableBalance &&
-          (existing().availableBalance - incoming().availableBalance) >= 3000 &&
-          existing().availableBalance >= 3000 &&
+          (existing().availableBalance - incoming().availableBalance) >= 5000 &&
+          existing().availableBalance >= 5000 &&
           incoming().diff(existing()).affectedKeys().hasOnly(['availableBalance', 'reservedBalance', 'updatedAt'])
         )
       );
@@ -161,7 +161,7 @@ service cloud.firestore {
              data.userId is string && data.userId.size() <= 128 &&
              data.walletType in ['bKash', 'Nagad'] &&
              data.walletNumber is string && data.walletNumber.size() >= 11 && data.walletNumber.size() <= 20 &&
-             data.amount is number && data.amount >= 3000 &&
+             data.amount is number && data.amount >= 5000 &&
              data.status in ['pending', 'processing', 'approved', 'paid', 'rejected'];
     }
 
