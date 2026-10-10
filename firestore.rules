@@ -80,7 +80,9 @@ service cloud.firestore {
              data.reservedBalance is number && data.reservedBalance >= 0 &&
              (!('pendingCommission' in data) || data.pendingCommission is number) &&
              (!('lifetimeApproved' in data) || data.lifetimeApproved is number) &&
-             (!('paidCommission' in data) || data.paidCommission is number);
+             (!('paidCommission' in data) || data.paidCommission is number) &&
+             (!('activeWithdrawalRequestId' in data) || data.activeWithdrawalRequestId == null ||
+               (data.activeWithdrawalRequestId is string && data.activeWithdrawalRequestId.size() <= 128));
     }
 
     match /wallets/{userId} {
@@ -105,7 +107,13 @@ service cloud.firestore {
           incoming().availableBalance < existing().availableBalance &&
           (existing().availableBalance - incoming().availableBalance) >= 5000 &&
           existing().availableBalance >= 5000 &&
-          incoming().diff(existing()).affectedKeys().hasOnly(['availableBalance', 'reservedBalance', 'updatedAt'])
+          incoming().activeWithdrawalRequestId is string &&
+          isValidId(incoming().activeWithdrawalRequestId) &&
+          getAfter(/databases/$(database)/documents/withdrawalRequests/$(incoming().activeWithdrawalRequestId)).data.userId == request.auth.uid &&
+          getAfter(/databases/$(database)/documents/withdrawalRequests/$(incoming().activeWithdrawalRequestId)).data.status == 'pending' &&
+          getAfter(/databases/$(database)/documents/withdrawalRequests/$(incoming().activeWithdrawalRequestId)).data.amount == (existing().availableBalance - incoming().availableBalance) &&
+          getAfter(/databases/$(database)/documents/withdrawalRequests/$(incoming().activeWithdrawalRequestId)).data.amount == (incoming().reservedBalance - existing().reservedBalance) &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['availableBalance', 'reservedBalance', 'activeWithdrawalRequestId', 'updatedAt'])
         )
       );
 
