@@ -108,6 +108,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const paidCommission = wallet?.paidCommission || 0;
   const currentMonthApproved = wallet?.currentMonthApproved || 0;
   const previousMonthApproved = wallet?.previousMonthApproved || 0;
+  const currentMonthLabel = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const previousMonthDate = new Date();
+  previousMonthDate.setDate(1);
+  previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
+  const previousMonthLabel = previousMonthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   const isEligibleForWithdrawal = availableBalance >= MIN_WITHDRAWAL_BDT;
   const progressPercent = Math.min(100, Math.round((availableBalance / MIN_WITHDRAWAL_BDT) * 100));
@@ -278,7 +283,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <div className="text-xl sm:text-2xl font-black text-slate-200">
             {formatBDT(currentMonthApproved)}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">October 2026 share</div>
+          <div className="text-[11px] text-slate-400 mt-1">{currentMonthLabel} share</div>
         </div>
 
         {/* Previous Month Carryover */}
@@ -467,7 +472,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         {activeTab === 'statement' && (
           <div className="space-y-4">
             <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800">
-              <h4 className="text-sm font-bold text-white mb-2">October 2026 Accounting Summary</h4>
+              <h4 className="text-sm font-bold text-white mb-2">{currentMonthLabel} Accounting Summary</h4>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                 <div>
                   <span className="text-slate-400 block">Gross Publisher Share</span>
