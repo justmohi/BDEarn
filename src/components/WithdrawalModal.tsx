@@ -30,7 +30,7 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
   const [step, setStep] = useState<'form' | 'review' | 'success'>('form');
   const [walletType, setWalletType] = useState<WalletType>('bKash');
   const [walletNumber, setWalletNumber] = useState('');
-  const [amount, setAmount] = useState<number>(5000);
+  const [amount, setAmount] = useState<number>(3000);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [submittedRequestId, setSubmittedRequestId] = useState('');
@@ -91,7 +91,7 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
   const resetForm = () => {
     setStep('form');
     setWalletNumber('');
-    setAmount(Math.max(5000, Math.min(5000, availableBalance)));
+    setAmount(Math.max(3000, Math.min(3000, availableBalance)));
     setErrorMessage('');
     onClose();
   };
@@ -141,7 +141,7 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
                 <div>
                   <p className="font-semibold">{t('insufficientBalance')}</p>
                   <p className="text-[11px] text-amber-300/80 mt-0.5">
-                    {t('needMoreToWithdraw', { remaining: 5000 - availableBalance })}
+                    {t('needMoreToWithdraw', { remaining: 3000 - availableBalance })}
                   </p>
                 </div>
               </div>
@@ -246,8 +246,8 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
                   <div className="absolute left-3.5 top-2.5 text-slate-400 font-bold">৳</div>
                   <input
                     type="number"
-                    min={5000}
-                    max={availableBalance || 5000}
+                    min={3000}
+                    max={availableBalance || 3000}
                     step={100}
                     value={amount}
                     onChange={(e) => setAmount(Number(e.target.value))}
@@ -258,7 +258,7 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
 
                 {/* Fast Presets */}
                 <div className="flex gap-2 mt-2">
-                  {[5000, 10000, 15000, 20000].map((preset) => (
+                  {[3000, 5000, 10000, 15000].map((preset) => (
                     <button
                       key={preset}
                       type="button"
@@ -289,7 +289,7 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
               {/* Submit CTA */}
               <button
                 type="submit"
-                disabled={!isEligible || availableBalance < 5000}
+                disabled={!isEligible || availableBalance < 3000}
                 className={`w-full py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${
                   isEligible
                     ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 active:scale-[0.98]'
