@@ -12,11 +12,12 @@ import {
   ShieldCheck, 
   ArrowUpRight, 
   ArrowDownRight,
-  RefreshCw
+  RefreshCw,
+  MousePointerClick
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { WithdrawalRequest, WalletTransaction } from '../types';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { formatBDT } from '../utils/security';
 import { MIN_WITHDRAWAL_BDT } from '../services/walletService';
@@ -37,6 +38,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [loadingHistory, setLoadingHistory] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'withdrawals' | 'transactions' | 'statement'>('withdrawals');
+  const [adImageClicks, setAdImageClicks] = useState<number>(0);
 
   useEffect(() => {
     if (currentUser) {
@@ -48,6 +50,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     if (!currentUser) return;
     setLoadingHistory(true);
     try {
+      // Load this user's image/card click counter.
+      try {
+        const clickStats = await getDoc(doc(db, 'adClickStats', currentUser.uid));
+        setAdImageClicks(clickStats.exists() ? Number(clickStats.data().totalClicks || 0) : 0);
+      } catch (clickError) {
+        console.warn('Ad click stats load notice:', clickError);
+      }
+
       // 1. Fetch user withdrawals
       const wQuery = query(
         collection(db, 'withdrawalRequests'),
@@ -193,6 +203,18 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               style={{ width: `${progressPercent}%` }}
             />
           </div>
+        </div>
+      </div>
+
+      {/* Ad image click count: counts clicks made while signed in, not verified network impressions. */}
+      <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between gap-4">
+        <div>
+          <div className="text-xs font-medium text-slate-400 mb-2">Ad Image Clicks</div>
+          <div className="text-2xl font-black text-cyan-400">{adImageClicks.toLocaleString()}</div>
+          <p className="text-[11px] text-slate-500 mt-1">Your recorded ad-card/image clicks</p>
+        </div>
+        <div className="w-11 h-11 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+          <MousePointerClick className="w-5 h-5" />
         </div>
       </div>
 
