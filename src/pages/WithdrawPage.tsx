@@ -27,7 +27,7 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
 
   const [walletType, setWalletType] = useState<WalletType>('bKash');
   const [walletNumber, setWalletNumber] = useState('');
-  const [amount, setAmount] = useState<number>(5000);
+  const [amount, setAmount] = useState<number>(3000);
   const [step, setStep] = useState<'form' | 'review' | 'success'>('form');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -256,7 +256,7 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
               </div>
 
               <div className="flex gap-2 mt-2">
-                {[5000, 10000, 15000, 25000].map(val => (
+                {[3000, 5000, 10000, 15000].map(val => (
                   <button
                     key={val}
                     type="button"
