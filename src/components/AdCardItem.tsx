@@ -29,12 +29,23 @@ export const AdCardItem: React.FC<AdCardItemProps> = ({ card }) => {
 
   return (
     <>
-      <div 
-        onClick={handleCardClick}
-        className="group bg-[#0f172a] hover:bg-[#131c36] border border-slate-800/90 hover:border-emerald-500/40 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col shadow-lg hover:shadow-emerald-950/20 cursor-pointer"
+      <div
+        className="group bg-[#0f172a] hover:bg-[#131c36] border border-slate-800/90 hover:border-emerald-500/40 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col shadow-lg hover:shadow-emerald-950/20"
       >
         {/* Card Thumbnail Image */}
-        <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
+        <div
+          onClick={handleCardClick}
+          role="link"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              handleCardClick();
+            }
+          }}
+          aria-label={`Open ad: ${displayTitle}`}
+          className="relative aspect-[16/10] overflow-hidden bg-slate-900 cursor-pointer"
+        >
           <img 
             src={card.imageUrl || DEFAULT_AD_IMAGE} 
             alt={displayTitle}
