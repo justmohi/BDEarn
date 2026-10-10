@@ -19,7 +19,7 @@ import {
 } from '../types';
 import { generateIdempotencyKey, isValidBdMobileNumber } from '../utils/security';
 
-export const MIN_WITHDRAWAL_BDT = 5000;
+export const MIN_WITHDRAWAL_BDT = 3000;
 
 export interface SubmitWithdrawalParams {
   userId: string;
