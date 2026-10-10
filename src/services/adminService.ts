@@ -161,3 +161,31 @@ export async function computeAdminStats(): Promise<AdminStats> {
     totalVerifiedRevenue
   };
 }
+
+
+export interface AdClickStats {
+  uid: string;
+  totalClicks: number;
+  lastClickedAdId?: string;
+  lastClickedAt?: unknown;
+}
+
+export async function fetchAllAdClickStats(): Promise<AdClickStats[]> {
+  try {
+    const snap = await getDocs(collection(db, 'adClickStats'));
+    return snap.docs.map(d => ({ uid: d.id, ...d.data() } as AdClickStats));
+  } catch (err) {
+    console.error('Error fetching ad click statistics:', err);
+    return [];
+  }
+}
+
+export async function fetchAllWalletBalances(): Promise<Record<string, number>> {
+  try {
+    const snap = await getDocs(collection(db, 'wallets'));
+    return Object.fromEntries(snap.docs.map(d => [d.id, Number(d.data().availableBalance || 0)]));
+  } catch (err) {
+    console.error('Error fetching wallet balances:', err);
+    return {};
+  }
+}
