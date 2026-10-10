@@ -127,7 +127,8 @@ service cloud.firestore {
     match /adCards/{cardId} {
       allow get: if isValidId(cardId);
       allow list: if true;
-      allow create, update, delete: if isAdmin() && (request.method == 'delete' || isValidAdCard(incoming()));
+      allow create, update: if isAdmin() && isValidAdCard(incoming());
+      allow delete: if isAdmin();
     }
 
     // 3A. Ad image/card click statistics.
