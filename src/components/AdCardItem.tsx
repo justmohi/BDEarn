@@ -3,6 +3,8 @@ import { ExternalLink, Tag, Sparkles } from 'lucide-react';
 import { AdCard } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 
+const DEFAULT_AD_IMAGE = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80';
+
 interface AdCardItemProps {
   card: AdCard;
 }
@@ -26,7 +28,7 @@ export const AdCardItem: React.FC<AdCardItemProps> = ({ card }) => {
         {/* Card Thumbnail Image */}
         <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
           <img 
-            src={card.imageUrl} 
+            src={card.imageUrl || DEFAULT_AD_IMAGE} 
             alt={displayTitle}
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
