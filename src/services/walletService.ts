@@ -175,11 +175,10 @@ export async function completeWithdrawalPayout(
       const currentPaid = walletData.paidCommission || 0;
 
       tx.update(walletRef, {
-          reservedBalance: currentReserved - reqData.amount,
-          paidCommission: currentPaid + reqData.amount,
-          updatedAt: new Date().toISOString()
-        });
-      }
+        reservedBalance: currentReserved - reqData.amount,
+        paidCommission: currentPaid + reqData.amount,
+        updatedAt: new Date().toISOString()
+      });
 
       // Mark request as paid
       tx.update(reqRef, {
@@ -268,11 +267,10 @@ export async function rejectWithdrawalPayout(
 
       // Refund reserved amount back to available balance.
       tx.update(walletRef, {
-          reservedBalance: currentReserved - reqData.amount,
-          availableBalance: currentAvailable + reqData.amount,
-          updatedAt: new Date().toISOString()
-        });
-      }
+        reservedBalance: currentReserved - reqData.amount,
+        availableBalance: currentAvailable + reqData.amount,
+        updatedAt: new Date().toISOString()
+      });
 
       // Mark request as rejected
       tx.update(reqRef, {
