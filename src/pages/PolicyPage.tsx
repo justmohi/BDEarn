@@ -64,7 +64,7 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ initialSection = 'adPoli
         </button>
       </div>
 
-      {/* 1. AD POLICY & NON-INCENTIVIZED ADSTERRA COMPLIANCE */}
+      {/* 1. AD POLICY & NON-INCENTIVIZED AD NETWORK COMPLIANCE */}
       {section === 'adPolicy' && (
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 text-sm text-slate-300 leading-relaxed">
           <div className="flex items-center gap-3">
@@ -73,7 +73,7 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ initialSection = 'adPoli
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">EarnBD Advertising & Anti-Fraud Policy</h2>
-              <p className="text-xs text-slate-400">Strict adherence to Adsterra and global ad network standards.</p>
+              <p className="text-xs text-slate-400">Strict adherence to advertising networks and global ad network standards.</p>
             </div>
           </div>
 
@@ -84,7 +84,7 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ initialSection = 'adPoli
           <div>
             <h3 className="text-base font-bold text-white mb-2">1. No Direct Click Incentive</h3>
             <p>
-              Under our integration terms with advertising networks including Adsterra, publishers must not encourage, solicit, or incentivize visitors to click on advertisements or sponsored links. Clicking an ad card does not increase your personal wallet balance.
+              Under our integration terms with advertising networks including advertising networks, publishers must not encourage, solicit, or incentivize visitors to click on advertisements or sponsored links. Clicking an ad card does not increase your personal wallet balance.
             </p>
           </div>
 
