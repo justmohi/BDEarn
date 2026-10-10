@@ -55,8 +55,8 @@ import {
 import { formatBDT, isValidExternalUrl } from '../utils/security';
 import { runAllSystemTests, TestResult } from '../utils/systemTests';
 import { ReferralAdminPanel } from '../components/ReferralAdminPanel';
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../firebase';
+
+const DEFAULT_AD_IMAGE = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80';
 
 const AD_CATEGORIES: AdCategory[] = [
   'Technology',
@@ -94,7 +94,7 @@ export const AdminPage: React.FC = () => {
   // Ad card form modal state
   const [editingCard, setEditingCard] = useState<Partial<AdCard> | null>(null);
   const [showAdModal, setShowAdModal] = useState(false);
-  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [adsterraLinks, setAdsterraLinks] = useState<string[]>(['']);
 
   // Commission modal
   const [showCommissionModal, setShowCommissionModal] = useState(false);
@@ -193,22 +193,51 @@ export const AdminPage: React.FC = () => {
     setIsProcessingAction(true);
     setActionError('');
     try {
-      let cardToSave = { ...editingCard };
-      if (selectedImageFile) {
-        if (!selectedImageFile.type.startsWith('image/')) throw new Error('Please choose an image file.');
-        if (selectedImageFile.size > 3 * 1024 * 1024) throw new Error('Image must be 3 MB or smaller.');
-        const safeName = selectedImageFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const objectRef = storageRef(storage, `adCards/${Date.now()}_${safeName}`);
-        const uploaded = await uploadBytes(objectRef, selectedImageFile, { contentType: selectedImageFile.type });
-        cardToSave.imageUrl = await getDownloadURL(uploaded.ref);
-      }
+      const cardToSave = { ...editingCard, imageUrl: editingCard.imageUrl || DEFAULT_AD_IMAGE };
       await saveAdCard(cardToSave);
       setShowAdModal(false);
       setEditingCard(null);
-      setSelectedImageFile(null);
       await loadAllAdminData();
     } catch (err: any) {
       setActionError(err.message || 'Failed to save ad card');
+    } finally {
+      setIsProcessingAction(false);
+    }
+  };
+
+  const handleAddAdsterraLinks = async () => {
+    const links = adsterraLinks.map(link => link.trim()).filter(Boolean);
+    if (links.length === 0) {
+      setActionError('Add at least one Adsterra link.');
+      return;
+    }
+    const invalidLink = links.find(link => !isValidExternalUrl(link));
+    if (invalidLink) {
+      setActionError('One or more links are invalid. Use a complete https:// or http:// URL.');
+      return;
+    }
+
+    setIsProcessingAction(true);
+    setActionError('');
+    try {
+      await Promise.all(links.map((destinationUrl, index) => saveAdCard({
+        title: `Adsterra Ad ${ads.length + index + 1}`,
+        titleBn: 'বিজ্ঞাপন',
+        description: 'Sponsored offer. Click to visit the advertiser.',
+        descriptionBn: 'বিজ্ঞাপনটি দেখতে ক্লিক করুন।',
+        category: 'Sponsored Offers',
+        imageUrl: DEFAULT_AD_IMAGE,
+        destinationUrl,
+        isSponsored: true,
+        isActive: true,
+        displayOrder: ads.length + index + 1,
+        openInNewTab: true
+      })));
+      setAdsterraLinks(['']);
+      await loadAllAdminData();
+      alert(`Successfully added ${links.length} Adsterra ad card(s).`);
+    } catch (err: any) {
+      setActionError(err.message || 'Failed to save Adsterra links.');
     } finally {
       setIsProcessingAction(false);
     }
@@ -584,6 +613,64 @@ export const AdminPage: React.FC = () => {
                 <span>Create New Ad Card</span>
               </button>
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-emerald-500/30 bg-slate-950/70 p-4 sm:p-5 space-y-4">
+            <div>
+              <h4 className="font-bold text-white text-base">Add Multiple Adsterra Links</h4>
+              <p className="text-xs text-slate-400 mt-1">
+                Add as many links as you need. Each link creates one ad card using the same built-in default image. No image upload or Firebase Storage required.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              {adsterraLinks.map((link, index) => (
+                <div key={index} className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="text-[10px] uppercase tracking-wide text-slate-500 block mb-1">Adsterra Link {index + 1}</label>
+                    <input
+                      type="url"
+                      value={link}
+                      onChange={(e) => setAdsterraLinks(current => current.map((item, i) => i === index ? e.target.value : item))}
+                      placeholder="https://..."
+                      className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2.5 text-white text-xs font-mono outline-none"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    aria-label={`Remove link ${index + 1}`}
+                    disabled={adsterraLinks.length === 1}
+                    onClick={() => setAdsterraLinks(current => current.filter((_, i) => i !== index))}
+                    className="self-end px-3 py-2.5 bg-slate-800 hover:bg-red-950 text-slate-300 rounded-xl disabled:opacity-30"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {actionError && (
+              <div className="p-2.5 bg-red-950/40 border border-red-800 rounded-lg text-xs text-red-200">{actionError}</div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setAdsterraLinks(current => [...current, ''])}
+                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" /> Add Another Link
+              </button>
+              <button
+                type="button"
+                onClick={handleAddAdsterraLinks}
+                disabled={isProcessingAction || adsterraLinks.every(link => !link.trim())}
+                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold disabled:opacity-50"
+              >
+                {isProcessingAction ? 'Saving Links...' : `Save ${adsterraLinks.filter(link => link.trim()).length} Link(s) & Create Cards`}
+              </button>
+            </div>
+            <p className="text-[10px] text-slate-500">Every saved link gets one card with the same default thumbnail. Cards can be edited, disabled, or deleted below.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -976,26 +1063,12 @@ export const AdminPage: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="text-slate-300 font-bold block mb-1">Upload Thumbnail Image (JPG, PNG, WEBP, GIF · max 3 MB)</label>
-                <input type="file" accept="image/png,image/jpeg,image/webp,image/gif"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    setSelectedImageFile(file);
-                    if (file) {
-                      if (!file.type.startsWith('image/')) { setActionError('Please choose an image file.'); setSelectedImageFile(null); }
-                      else if (file.size > 3 * 1024 * 1024) { setActionError('Image must be 3 MB or smaller.'); setSelectedImageFile(null); }
-                      else { setActionError(''); setEditingCard({ ...editingCard, imageUrl: URL.createObjectURL(file) }); }
-                    }
-                  }}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-600 file:px-3 file:py-1.5 file:text-white" />
-                <p className="text-[10px] text-slate-500 mt-1">Choose an image from your phone or computer. It uploads securely when you save the card.</p>
-                <label className="text-slate-300 font-bold block mt-3 mb-1">Or use an existing Image URL</label>
-                <input type="url" value={selectedImageFile ? '' : (editingCard.imageUrl || '')}
-                  onChange={(e) => { setSelectedImageFile(null); setEditingCard({ ...editingCard, imageUrl: e.target.value }); }}
-                  placeholder="https://example.com/banner.jpg"
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none font-mono"
-                  required={!selectedImageFile} />
+              <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+                <label className="text-slate-300 font-bold block mb-1">Default Thumbnail Image</label>
+                <div className="flex items-center gap-3">
+                  <img src={editingCard.imageUrl || DEFAULT_AD_IMAGE} alt="Default ad thumbnail" className="w-24 h-16 rounded-lg object-cover bg-slate-950" />
+                  <p className="text-[11px] text-slate-400">No upload required. New ad cards automatically use the built-in default image, so Firebase Storage is not used.</p>
+                </div>
               </div>
 
               <div>
@@ -1037,7 +1110,7 @@ export const AdminPage: React.FC = () => {
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 mt-2">
                 <span className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Live Card Preview</span>
                 <div className="flex gap-3 items-center">
-                  <img src={editingCard.imageUrl} alt="preview" className="w-16 h-12 object-cover rounded-lg bg-slate-900" />
+                  <img src={editingCard.imageUrl || DEFAULT_AD_IMAGE} alt="preview" className="w-16 h-12 object-cover rounded-lg bg-slate-900" />
                   <div>
                     <h5 className="font-bold text-white text-xs">{editingCard.title || 'Untitled Card'}</h5>
                     <span className="text-[10px] text-emerald-400 font-semibold">{editingCard.category}</span>
@@ -1048,7 +1121,7 @@ export const AdminPage: React.FC = () => {
               <div className="flex gap-3 pt-3">
                 <button
                   type="button"
-                  onClick={() => { setShowAdModal(false); setSelectedImageFile(null); setActionError(''); }}
+                  onClick={() => { setShowAdModal(false); setActionError(''); }}
                   className="flex-1 py-2.5 bg-slate-800 text-slate-300 rounded-xl font-bold"
                 >
                   Cancel
