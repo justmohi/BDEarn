@@ -51,8 +51,11 @@ service cloud.firestore {
       
       // On creation, normal users can only set role to 'user' and status to 'active'
       allow create: if isValidId(userId) && isOwner(userId) && isValidUser(incoming()) &&
-                    incoming().role == 'user' &&
-                    incoming().status == 'active';
+                    incoming().status == 'active' &&
+                    (
+                      incoming().role == 'user' ||
+                      (isAdmin() && incoming().role == 'admin')
+                    );
 
       // Updates: Admins can update roles/status; owners can update profile info but cannot change role, status, or uid
       allow update: if isValidId(userId) && (
@@ -161,7 +164,7 @@ service cloud.firestore {
                     isValidWithdrawalRequest(incoming()) &&
                     incoming().userId == request.auth.uid &&
                     incoming().status == 'pending' &&
-                    incoming().amount >= 3000;
+                    incoming().amount >= 5000;
 
       // Updates: only Admin can change status, transactionRef, adminNotes
       allow update: if isValidId(requestId) && isAdmin() && isValidWithdrawalRequest(incoming());
@@ -206,7 +209,7 @@ service cloud.firestore {
     // 9. Audit Logs
     match /auditLogs/{logId} {
       allow get, list: if isAdmin();
-      allow create: if isAdmin() || isSignedIn();
+      allow create: if isAdmin();
       allow update, delete: if false; // Immutable audit log
     }
 
