@@ -415,3 +415,52 @@ export async function creditCommissionToUser(
     throw err;
   }
 }
+
+
+/** Admin-only manual wallet credit, recorded in both the ledger and audit log. */
+export async function adminCreditBalance(
+  userId: string,
+  amount: number,
+  note: string,
+  adminEmail: string
+): Promise<void> {
+  if (!userId) throw new Error('Select a valid user.');
+  if (!Number.isSafeInteger(amount) || amount <= 0) throw new Error('Enter a positive whole-number BDT amount.');
+  if (!adminEmail) throw new Error('Admin session is required.');
+
+  const txId = `tx_admin_credit_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const auditId = `log_admin_credit_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const now = new Date().toISOString();
+
+  await runTransaction(db, async (tx) => {
+    const walletRef = doc(db, 'wallets', userId);
+    const walletSnap = await tx.get(walletRef);
+    const wallet = walletSnap.exists() ? walletSnap.data() as UserWallet : null;
+    const nextWallet = {
+      uid: userId,
+      availableBalance: Number(wallet?.availableBalance || 0) + amount,
+      reservedBalance: Number(wallet?.reservedBalance || 0),
+      pendingCommission: Number(wallet?.pendingCommission || 0),
+      lifetimeApproved: Number(wallet?.lifetimeApproved || 0) + amount,
+      paidCommission: Number(wallet?.paidCommission || 0),
+      currentMonthApproved: Number(wallet?.currentMonthApproved || 0) + amount,
+      previousMonthApproved: Number(wallet?.previousMonthApproved || 0),
+      ...(wallet?.activeWithdrawalRequestId ? { activeWithdrawalRequestId: wallet.activeWithdrawalRequestId } : {}),
+      updatedAt: now
+    };
+    if (walletSnap.exists()) tx.update(walletRef, nextWallet);
+    else tx.set(walletRef, nextWallet);
+
+    tx.set(doc(db, 'walletTransactions', txId), {
+      id: txId, userId, type: 'admin_credit', amount, status: 'completed',
+      description: note.trim() || 'Admin balance credit', referenceId: auditId,
+      idempotencyKey: txId, createdAt: now
+    });
+    tx.set(doc(db, 'auditLogs', auditId), {
+      id: auditId, actorId: 'admin', actorEmail: adminEmail,
+      action: 'ADMIN_BALANCE_CREDITED',
+      details: `Credited ৳${amount} to user ${userId}. Note: ${note.trim() || 'Admin balance credit'}`,
+      timestamp: now
+    });
+  });
+}
