@@ -19,7 +19,7 @@ import {
 } from '../types';
 import { generateIdempotencyKey, isValidBdMobileNumber } from '../utils/security';
 
-export const MIN_WITHDRAWAL_BDT = 5000;
+export const MIN_WITHDRAWAL_BDT = 3000;
 
 export interface SubmitWithdrawalParams {
   userId: string;
@@ -31,7 +31,7 @@ export interface SubmitWithdrawalParams {
 
 /**
  * Submits a manual bKash or Nagad withdrawal request.
- * Atomically validates balance >= 5000 and reserves funds to prevent double-spending.
+ * Atomically validates balance >= minimum withdrawal amount and reserves funds to prevent double-spending.
  */
 export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): Promise<{ requestId: string; transactionId: string }> {
   const { userId, userEmail, walletType, walletNumber, amount } = params;
