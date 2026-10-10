@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+ <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c9ff65"/><stop offset=".32" stop-color="#00c878"/><stop offset=".7" stop-color="#006b50"/><stop offset="1" stop-color="#002f32"/></linearGradient>
+ <linearGradient id="y" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff36a"/><stop offset=".5" stop-color="#ffc400"/><stop offset="1" stop-color="#f08a00"/></linearGradient>
+ <linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#36ee35"/><stop offset="1" stop-color="#00503c"/></linearGradient>
+</defs>
+<path fill="url(#g)" stroke="#008a60" stroke-width="3" d="M112 276V158C112 82 177 31 261 31h164c-21 53-58 83-112 83H253c-38 0-58 20-58 56v106z"/>
+<path fill="url(#g)" stroke="#00a879" stroke-width="3" d="M70 365c18-104 52-172 125-172h182c-21 44-53 65-104 65H184c-35 0-61 39-77 107z"/>
+<path fill="url(#b)" d="M223 390h44V341l-44 18zM294 390h44V305l-44 23zM365 390h44V267l-44 23z"/>
+<path fill="url(#g)" d="M170 386h255c-20 37-49 50-91 50H193c-37 0-61-12-78-31l55-19z"/>
+<path fill="url(#y)" stroke="#e6a000" stroke-width="3" stroke-linejoin="round" d="M57 402c23-45 59-68 119-80l140-29 119-117-7-45 54-27-6 109-29-29-97 95c-34 32-74 49-132 61l-92 18c-29 6-49 17-69 44z"/>
+</svg>
