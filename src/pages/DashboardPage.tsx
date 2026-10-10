@@ -289,7 +289,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         {/* Previous Month Carryover */}
         <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">{t('previousMonthEarnings')}</span>
+            <span className="text-xs font-medium">{t('previousMonthEarnings')} ({previousMonthLabel})</span>
             <Layers className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-xl sm:text-2xl font-black text-slate-200">
