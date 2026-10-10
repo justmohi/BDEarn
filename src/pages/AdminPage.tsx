@@ -49,8 +49,7 @@ import {
 import { 
   fetchAllAdCards, 
   saveAdCard, 
-  deleteAdCard, 
-  seedInitialAdCards 
+  deleteAdCard
 } from '../services/adService';
 import { formatBDT, isValidExternalUrl } from '../utils/security';
 import { runAllSystemTests, TestResult } from '../utils/systemTests';
@@ -632,15 +631,6 @@ export const AdminPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                onClick={async () => {
-                  await seedInitialAdCards();
-                  await loadAllAdminData();
-                }}
-                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold"
-              >
-                Re-seed Defaults
-              </button>
               <button
                 onClick={handleAssignDistinctAdImages}
                 disabled={isProcessingAction}
