@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { ExternalLink, Tag, Sparkles } from 'lucide-react';
 import { AdCard } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import { SafeRedirectModal } from './SafeRedirectModal';
 
 interface AdCardItemProps {
   card: AdCard;
@@ -10,15 +9,12 @@ interface AdCardItemProps {
 
 export const AdCardItem: React.FC<AdCardItemProps> = ({ card }) => {
   const { language, t } = useAuth();
-  const [showRedirectModal, setShowRedirectModal] = useState(false);
 
   const displayTitle = (language === 'bn' && card.titleBn) ? card.titleBn : card.title;
   const displayDesc = (language === 'bn' && card.descriptionBn) ? card.descriptionBn : card.description;
 
   const handleCardClick = () => {
-    if (card.destinationUrl) {
-      setShowRedirectModal(true);
-    }
+    if (card.destinationUrl) window.open(card.destinationUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -76,14 +72,6 @@ export const AdCardItem: React.FC<AdCardItemProps> = ({ card }) => {
         </div>
       </div>
 
-      {card.destinationUrl && (
-        <SafeRedirectModal
-          isOpen={showRedirectModal}
-          onClose={() => setShowRedirectModal(false)}
-          targetUrl={card.destinationUrl}
-          sponsorTitle={displayTitle}
-        />
-      )}
     </>
   );
 };
