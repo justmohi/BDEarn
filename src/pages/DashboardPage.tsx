@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { WithdrawalRequest, WalletTransaction } from '../types';
-import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { formatBDT } from '../utils/security';
 import { MIN_WITHDRAWAL_BDT } from '../services/walletService';
@@ -45,6 +45,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       loadHistory();
     }
   }, [currentUser]);
+
+  // Keep the signed-in user's click total synchronized with Firestore in real time.
+  useEffect(() => {
+    if (!currentUser) {
+      setAdImageClicks(0);
+      return;
+    }
+    const clickStatsRef = doc(db, 'adClickStats', currentUser.uid);
+    const unsubscribe = onSnapshot(clickStatsRef, (snapshot) => {
+      setAdImageClicks(snapshot.exists() ? Number(snapshot.data().totalClicks || 0) : 0);
+    }, (error) => {
+      console.warn('Live ad click stats unavailable:', error);
+    });
+    return unsubscribe;
+  }, [currentUser?.uid]);
 
   const loadHistory = async () => {
     if (!currentUser) return;
