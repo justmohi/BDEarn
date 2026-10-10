@@ -170,7 +170,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-pink-400 mb-1">
               <ShieldCheck className="w-4 h-4" />
-              <span>{t('withdrawalGoalTitle')} (৳3,000 BDT)</span>
+              <span>{t('withdrawalGoalTitle')} ({formatBDT(MIN_WITHDRAWAL_BDT)})</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-black text-white">
               {isEligibleForWithdrawal ? (
@@ -192,11 +192,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
         </div>
 
-        {/* Progress bar towards ৳3,000 */}
+        {/* Progress bar towards the minimum withdrawal amount */}
         <div className="space-y-2">
           <div className="flex justify-between text-xs font-semibold text-slate-300">
             <span>Current: {formatBDT(availableBalance)}</span>
-            <span>Target: ৳3,000 BDT ({progressPercent}%)</span>
+            <span>Target: {formatBDT(MIN_WITHDRAWAL_BDT)} ({progressPercent}%)</span>
           </div>
           <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
             <div 
