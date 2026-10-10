@@ -72,6 +72,7 @@ export interface WithdrawalRequest {
 
 export type TransactionType = 
   | 'commission_credit'
+  | 'referral_bonus'
   | 'withdrawal_reserve'
   | 'withdrawal_payout'
   | 'withdrawal_refund'

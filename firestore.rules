@@ -195,7 +195,21 @@ service cloud.firestore {
       allow update, delete: if false; // Immutable audit log
     }
 
-    // 10. Admins
+    // 10. Referrals: clients may only read their own referral records.
+    // Claims and all status/bonus changes are performed by the authenticated server function.
+    match /referrals/{referralId} {
+      allow get: if isSignedIn() && (
+        isAdmin() ||
+        resource.data.referrerUid == request.auth.uid ||
+        resource.data.referredUid == request.auth.uid
+      );
+      allow list: if isAdmin() || (
+        isSignedIn() && resource.data.referrerUid == request.auth.uid
+      );
+      allow create, update, delete: if false;
+    }
+
+    // 11. Admins
     match /admins/{adminId} {
       allow get: if isSignedIn();
       allow list: if isAdmin();

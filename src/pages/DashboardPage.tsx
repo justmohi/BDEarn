@@ -20,6 +20,7 @@ import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { formatBDT } from '../utils/security';
 import { MIN_WITHDRAWAL_BDT } from '../services/walletService';
+import { ReferralPanel } from '../components/ReferralPanel';
 
 interface DashboardPageProps {
   onOpenWithdraw: () => void;
@@ -401,7 +402,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs ${
-                        tx.type === 'commission_credit' || tx.type === 'withdrawal_refund'
+                        tx.type === 'commission_credit' || tx.type === 'withdrawal_refund' || tx.type === 'referral_bonus'
                           ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                           : 'bg-pink-500/10 text-pink-400 border border-pink-500/20'
                       }`}>
@@ -472,6 +473,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
       </div>
 
+      <ReferralPanel />
     </div>
   );
 };
