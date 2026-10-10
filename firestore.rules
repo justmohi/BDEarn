@@ -137,8 +137,8 @@ service cloud.firestore {
         incoming().totalClicks is number && incoming().totalClicks >= 1 &&
         incoming().totalClicks <= 1000000000 &&
         incoming().lastClickedAdId is string && incoming().lastClickedAdId.size() <= 128 &&
-        incoming().diff(resource == null ? {} : existing()).affectedKeys()
-          .hasOnly(['uid', 'totalClicks', 'lastClickedAdId', 'lastClickedAt']);
+        incoming().keys().hasOnly(['uid', 'totalClicks', 'lastClickedAdId', 'lastClickedAt']) &&
+        incoming().keys().hasAll(['uid', 'totalClicks', 'lastClickedAdId', 'lastClickedAt']);
       allow delete: if isAdmin();
     }
 
