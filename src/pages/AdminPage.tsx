@@ -56,7 +56,34 @@ import { formatBDT, isValidExternalUrl } from '../utils/security';
 import { runAllSystemTests, TestResult } from '../utils/systemTests';
 import { ReferralAdminPanel } from '../components/ReferralAdminPanel';
 
-const DEFAULT_AD_IMAGE = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80';
+const DEFAULT_AD_IMAGES = [
+  'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80'
+];
+const DEFAULT_AD_IMAGE = DEFAULT_AD_IMAGES[0];
+const getDefaultAdImage = (index: number) => DEFAULT_AD_IMAGES[((index % DEFAULT_AD_IMAGES.length) + DEFAULT_AD_IMAGES.length) % DEFAULT_AD_IMAGES.length];
 
 const AD_CATEGORIES: AdCategory[] = [
   'Technology',
@@ -226,7 +253,7 @@ export const AdminPage: React.FC = () => {
         description: 'Sponsored offer. Click to visit the advertiser.',
         descriptionBn: 'বিজ্ঞাপনটি দেখতে ক্লিক করুন।',
         category: 'Sponsored Offers',
-        imageUrl: DEFAULT_AD_IMAGE,
+        imageUrl: getDefaultAdImage(ads.length + index),
         destinationUrl,
         isSponsored: true,
         isActive: true,
@@ -238,6 +265,31 @@ export const AdminPage: React.FC = () => {
       alert(`Successfully added ${links.length} Adsterra ad card(s).`);
     } catch (err: any) {
       setActionError(err.message || 'Failed to save Adsterra links.');
+    } finally {
+      setIsProcessingAction(false);
+    }
+  };
+
+  const handleAssignDistinctAdImages = async () => {
+    const linkedAds = ads.filter(ad => Boolean(ad.destinationUrl) && (ad.isSponsored || ad.category === 'Sponsored Offers'));
+    if (linkedAds.length === 0) {
+      alert('No linked Adsterra/sponsored cards found.');
+      return;
+    }
+    if (!confirm(`Assign different default images to ${linkedAds.length} linked ad card(s)?`)) return;
+
+    setIsProcessingAction(true);
+    setActionError('');
+    try {
+      await Promise.all(linkedAds.map((ad, index) => saveAdCard({
+        ...ad,
+        imageUrl: getDefaultAdImage(index),
+        updatedAt: new Date().toISOString()
+      })));
+      await loadAllAdminData();
+      alert(`Updated images for ${linkedAds.length} linked ad card(s).`);
+    } catch (err: any) {
+      setActionError(err.message || 'Failed to assign different ad images.');
     } finally {
       setIsProcessingAction(false);
     }
@@ -428,7 +480,7 @@ export const AdminPage: React.FC = () => {
                     description: '',
                     descriptionBn: '',
                     category: 'Technology',
-                    imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
+                    imageUrl: getDefaultAdImage(ads.length),
                     destinationUrl: '',
                     isSponsored: false,
                     isActive: true,
@@ -589,6 +641,13 @@ export const AdminPage: React.FC = () => {
               >
                 Re-seed Defaults
               </button>
+              <button
+                onClick={handleAssignDistinctAdImages}
+                disabled={isProcessingAction}
+                className="px-3 py-2 bg-cyan-700 hover:bg-cyan-600 text-white rounded-xl text-xs font-semibold disabled:opacity-50"
+              >
+                {isProcessingAction ? 'Updating Images...' : 'Assign Different Images'}
+              </button>
 
               <button
                 onClick={() => {
@@ -598,7 +657,7 @@ export const AdminPage: React.FC = () => {
                     description: '',
                     descriptionBn: '',
                     category: 'Technology',
-                    imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
+                    imageUrl: getDefaultAdImage(ads.length),
                     destinationUrl: '',
                     isSponsored: true,
                     isActive: true,
