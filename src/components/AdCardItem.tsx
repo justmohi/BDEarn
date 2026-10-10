@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ExternalLink, Tag, Sparkles } from 'lucide-react';
 import { AdCard } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { recordAdImageClick } from '../services/adClickService';
 
 const DEFAULT_AD_IMAGE = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80';
 
@@ -10,13 +11,20 @@ interface AdCardItemProps {
 }
 
 export const AdCardItem: React.FC<AdCardItemProps> = ({ card }) => {
-  const { language, t } = useAuth();
+  const { language, t, currentUser } = useAuth();
 
   const displayTitle = (language === 'bn' && card.titleBn) ? card.titleBn : card.title;
   const displayDesc = (language === 'bn' && card.descriptionBn) ? card.descriptionBn : card.description;
 
   const handleCardClick = () => {
-    if (card.destinationUrl) window.open(card.destinationUrl, '_blank', 'noopener,noreferrer');
+    if (!card.destinationUrl) return;
+    // Open immediately to avoid popup blockers; record the click in the background.
+    window.open(card.destinationUrl, '_blank', 'noopener,noreferrer');
+    if (currentUser) {
+      void recordAdImageClick(currentUser.uid, card.id).catch((error) => {
+        console.warn('Could not record ad click:', error);
+      });
+    }
   };
 
   return (
