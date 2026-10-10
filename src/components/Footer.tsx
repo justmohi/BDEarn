@@ -17,9 +17,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigatePolicy }) => {
           {/* Brand & Mission */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold text-sm">
-                ৳
-              </div>
+              <img src="/earnbd-logo.svg" alt="EarnBD logo" className="w-8 h-8 object-contain" />
               <span className="text-lg font-black text-white">
                 Earn<span className="text-emerald-400">BD</span>
               </span>
