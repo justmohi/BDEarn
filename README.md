@@ -60,3 +60,25 @@ The application uses `firebase-applet-config.json` generated during Firebase pro
 - Ownership checks on `/users/{userId}`, `/wallets/{userId}`, `/withdrawalRequests/{requestId}`.
 - Immutable ledger in `/walletTransactions/{txId}`.
 - Administrative gates via bootstrap email (`mohistudio95@gmail.com`) and `/admins/{uid}` document.
+
+## 🎁 Referral Bonus System
+
+- Every signed-in user can share a link in the format `/?ref=<referrer-firebase-uid>`.
+- A valid new account receives a **BDT 100 pending referral record** for the referrer; it is not immediately withdrawable.
+- The eligibility period is **30 complete days** from account registration.
+- After 30 days, an administrator can approve the bonus only if both accounts are active and the referred user's Firebase email is verified.
+- Approval credits the referrer's wallet once using a deterministic ledger ID. The existing **BDT 5,000 minimum withdrawal** still applies.
+- Self-referrals, duplicate referral claims, client-side bonus changes, and premature approvals are rejected.
+- User referral history is read-only from the client. Claims, approvals, and wallet credits are handled by `netlify/functions/referral.ts`.
+
+### Required Netlify environment variables
+
+Configure these in **Netlify → Site configuration → Environment variables**; do not commit private credentials to GitHub:
+
+- `FIREBASE_SERVICE_ACCOUNT_JSON`: the complete Firebase service-account JSON for the same Firebase project used by this app. Keep it private.
+- `FIRESTORE_DATABASE_ID`: the exact named Firestore database ID from `firebase-applet-config.json`.
+- `URL`: your deployed site's origin, if you need to customize the function's CORS origin.
+
+The referral function uses Firebase Admin SDK to verify Firebase ID tokens and to perform trusted Firestore transactions. Without the service-account environment variable, referral claims and admin reviews will return a configuration error. After setting the variables, redeploy the site.
+
+**Important:** this referral feature is not a reward for ad clicks or ad views. Keep advertising-based rewards disabled unless the advertising provider has explicitly approved the monetization model.
