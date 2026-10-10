@@ -562,13 +562,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <div className="text-xl sm:text-2xl font-black text-slate-200">
             {formatBDT(currentMonthApproved)}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">October 2026 share</div>
+          <div className="text-[11px] text-slate-400 mt-1">{currentMonthLabel} share</div>
         </div>
 
         {/* Previous Month Carryover */}
         <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">{t('previousMonthEarnings')}</span>
+            <span className="text-xs font-medium">{t('previousMonthEarnings')} ({previousMonthLabel})</span>
             <Layers className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-xl sm:text-2xl font-black text-slate-200">
@@ -751,7 +751,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         {activeTab === 'statement' && (
           <div className="space-y-4">
             <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800">
-              <h4 className="text-sm font-bold text-white mb-2">October 2026 Accounting Summary</h4>
+              <h4 className="text-sm font-bold text-white mb-2">{currentMonthLabel} Accounting Summary</h4>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                 <div>
                   <span className="text-slate-400 block">Gross Publisher Share</span>
