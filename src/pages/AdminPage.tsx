@@ -39,12 +39,15 @@ import {
   saveMonthlyReport, 
   fetchAuditLogs, 
   computeAdminStats, 
-  AdminStats 
+  fetchAllAdClickStats,
+  fetchAllWalletBalances,
+  AdminStats
 } from '../services/adminService';
 import { 
   completeWithdrawalPayout, 
   rejectWithdrawalPayout, 
-  creditCommissionToUser 
+  creditCommissionToUser,
+  adminCreditBalance
 } from '../services/walletService';
 import { 
   fetchAllAdCards, 
@@ -107,6 +110,10 @@ export const AdminPage: React.FC = () => {
   const [ads, setAds] = useState<AdCard[]>([]);
   const [reports, setReports] = useState<MonthlyReport[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [clickCounts, setClickCounts] = useState<Record<string, number>>({});
+  const [walletBalances, setWalletBalances] = useState<Record<string, number>>({});
+  const [creditAmounts, setCreditAmounts] = useState<Record<string, string>>({});
+  const [creditNotes, setCreditNotes] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<boolean>(true);
 
   // Modals state
@@ -140,13 +147,15 @@ export const AdminPage: React.FC = () => {
   const loadAllAdminData = async () => {
     setLoading(true);
     try {
-      const [s, w, u, a, r, l] = await Promise.all([
+      const [s, w, u, a, r, l, clickStats, balances] = await Promise.all([
         computeAdminStats(),
         fetchAllWithdrawalRequests(),
         fetchAllUsers(),
         fetchAllAdCards(),
         fetchMonthlyReports(),
-        fetchAuditLogs()
+        fetchAuditLogs(),
+        fetchAllAdClickStats(),
+        fetchAllWalletBalances()
       ]);
       setStats(s);
       setWithdrawals(w);
@@ -154,10 +163,37 @@ export const AdminPage: React.FC = () => {
       setAds(a);
       setReports(r);
       setAuditLogs(l);
+      setClickCounts(Object.fromEntries(clickStats.map(item => [item.uid, Number(item.totalClicks || 0)])));
+      setWalletBalances(balances);
     } catch (e) {
       console.error('Failed to load admin data:', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAdminBalanceCredit = async (userId: string) => {
+    if (!currentUser?.email) {
+      setActionError('Admin session is required.');
+      return;
+    }
+    const amount = Number(creditAmounts[userId] || 0);
+    if (!Number.isSafeInteger(amount) || amount <= 0) {
+      setActionError('Enter a positive whole-number BDT amount.');
+      return;
+    }
+    setIsProcessingAction(true);
+    setActionError('');
+    try {
+      await adminCreditBalance(userId, amount, creditNotes[userId] || '', currentUser.email);
+      setCreditAmounts(previous => ({ ...previous, [userId]: '' }));
+      setCreditNotes(previous => ({ ...previous, [userId]: '' }));
+      await loadAllAdminData();
+      alert(`Successfully added ৳${amount.toLocaleString()} to the user's available balance.`);
+    } catch (err: any) {
+      setActionError(err.message || 'Could not add balance. Check Firestore rules deployment.');
+    } finally {
+      setIsProcessingAction(false);
     }
   };
 
@@ -822,38 +858,73 @@ export const AdminPage: React.FC = () => {
       {/* 5. USERS TAB */}
       {activeTab === 'users' && (
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
-          <h3 className="text-lg font-bold text-white mb-4">
-            Registered Publishers & Anti-Fraud Account Status
+          <h3 className="text-lg font-bold text-white mb-2">
+            Registered Publishers, Click Counts & Wallet Management
           </h3>
+          <p className="text-xs text-slate-400 mb-4">
+            Click counts are recorded ad-card/image clicks, not verified ad-network impressions. Use Add Balance to credit a user's withdrawable wallet; minimum withdrawal is ৳3,000.
+          </p>
+          {actionError && <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300">{actionError}</div>}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] font-bold">
                 <tr>
-                  <th className="p-3">UID</th>
-                  <th className="p-3">Name</th>
-                  <th className="p-3">Email</th>
-                  <th className="p-3">Role</th>
-                  <th className="p-3">Account Status</th>
-                  <th className="p-3 text-right">Action</th>
+                  <th className="p-3">User</th>
+                  <th className="p-3">Email / UID</th>
+                  <th className="p-3">Role / Status</th>
+                  <th className="p-3">Ad Image Clicks</th>
+                  <th className="p-3">Available Balance</th>
+                  <th className="p-3">Add BDT</th>
+                  <th className="p-3">Admin Note (optional)</th>
+                  <th className="p-3">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
                 {users.map((u) => (
-                  <tr key={u.uid} className="hover:bg-slate-800/40">
-                    <td className="p-3 font-mono text-slate-400">{u.uid.slice(0, 10)}...</td>
+                  <tr key={u.uid} className="hover:bg-slate-800/40 align-top">
                     <td className="p-3 font-bold text-white">{u.displayName || 'Publisher'}</td>
-                    <td className="p-3 text-slate-300">{u.email}</td>
-                    <td className="p-3 font-semibold uppercase text-[10px] text-cyan-400">{u.role}</td>
                     <td className="p-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                        u.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-                      }`}>
-                        {u.status}
-                      </span>
+                      <div className="text-slate-300">{u.email}</div>
+                      <div className="font-mono text-[10px] text-slate-500">{u.uid}</div>
                     </td>
-                    <td className="p-3 text-right">
-                      {u.role !== 'admin' && (
-                        <button
+                    <td className="p-3">
+                      <div className="font-semibold uppercase text-[10px] text-cyan-400">{u.role}</div>
+                      <span className={`mt-1 inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                        u.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                      }`}>{u.status}</span>
+                    </td>
+                    <td className="p-3 text-center">
+                      <span className="inline-flex min-w-12 justify-center rounded-lg bg-cyan-500/10 px-3 py-2 text-sm font-black text-cyan-300">{(clickCounts[u.uid] || 0).toLocaleString()}</span>
+                    </td>
+                    <td className="p-3 whitespace-nowrap font-bold text-emerald-300">{formatBDT(walletBalances[u.uid] || 0)}</td>
+                    <td className="p-3">
+                      {u.role !== 'admin' && <input
+                        type="number" min="1" step="1" inputMode="numeric"
+                        value={creditAmounts[u.uid] || ''}
+                        onChange={e => setCreditAmounts(previous => ({ ...previous, [u.uid]: e.target.value }))}
+                        placeholder="e.g. 3000"
+                        className="w-28 rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-white outline-none focus:border-emerald-500"
+                        aria-label={`Balance credit amount for ${u.email}`}
+                      />}
+                    </td>
+                    <td className="p-3">
+                      {u.role !== 'admin' && <input
+                        type="text" maxLength={160}
+                        value={creditNotes[u.uid] || ''}
+                        onChange={e => setCreditNotes(previous => ({ ...previous, [u.uid]: e.target.value }))}
+                        placeholder="Reason / reference"
+                        className="w-40 rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-white outline-none focus:border-emerald-500"
+                        aria-label={`Admin note for ${u.email}`}
+                      />}
+                    </td>
+                    <td className="p-3">
+                      <div className="flex flex-col items-start gap-2">
+                        {u.role !== 'admin' && <button
+                          disabled={isProcessingAction || !creditAmounts[u.uid]}
+                          onClick={() => handleAdminBalanceCredit(u.uid)}
+                          className="rounded-lg bg-emerald-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40 whitespace-nowrap"
+                        >Add Balance</button>}
+                        {u.role !== 'admin' && <button
                           onClick={async () => {
                             const newStatus = u.status === 'active' ? 'suspended' : 'active';
                             if (currentUser?.email) {
@@ -861,15 +932,13 @@ export const AdminPage: React.FC = () => {
                               await loadAllAdminData();
                             }
                           }}
-                          className={`px-2.5 py-1 rounded text-[11px] font-bold ${
+                          className={`rounded-lg px-3 py-1.5 text-[11px] font-bold ${
                             u.status === 'active'
                               ? 'bg-red-950 text-red-300 border border-red-800'
                               : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
                           }`}
-                        >
-                          {u.status === 'active' ? 'Suspend' : 'Activate'}
-                        </button>
-                      )}
+                        >{u.status === 'active' ? 'Suspend' : 'Activate'}</button>}
+                      </div>
                     </td>
                   </tr>
                 ))}
