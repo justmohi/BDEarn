@@ -14,7 +14,7 @@ EarnBD is a modern, mobile-first digital advertising directory and transparent p
    - The platform **NEVER** requests wallet PINs, OTPs, or passwords.
    - Admin reviews the request, executes the transfer manually via bKash/Nagad, and inputs the official Transaction Reference (TrxID).
    - If rejected, the reserved funds are atomically returned to the user's available balance with an audit reason.
-4. **Zero-Incentivized Click Policy (Adsterra & Global Network Compliance)**:
+4. **Zero-Incentivized Click Policy (Global Advertising Network Compliance)**:
    - EarnBD strictly prohibits Paid-to-Click (PTC), forced ad viewing, automated bots, or paying users for visiting links.
    - Visiting directory sponsor cards does not yield per-click credits.
    - Publisher commissions are derived solely from verified monthly net receipts.
