@@ -107,7 +107,7 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
             Manual Payout Portal
           </span>
           <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">
-            BDT ৳5,000 Minimum
+            BDT ৳{MIN_WITHDRAWAL_BDT.toLocaleString()} Minimum
           </span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-black text-white">
@@ -126,7 +126,7 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
             {formatBDT(availableBalance)}
           </div>
           <div className="text-xs text-slate-400 mt-1">
-            Requirement: Minimum ৳5,000 threshold to withdraw.
+            Requirement: Minimum {formatBDT(MIN_WITHDRAWAL_BDT)} threshold to withdraw.
           </div>
         </div>
 
@@ -245,8 +245,8 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
                 <span className="absolute left-4 top-3 text-slate-400 font-bold text-lg">৳</span>
                 <input
                   type="number"
-                  min={5000}
-                  max={availableBalance || 5000}
+                  min={MIN_WITHDRAWAL_BDT}
+                  max={availableBalance || MIN_WITHDRAWAL_BDT}
                   step={100}
                   value={amount}
                   onChange={(e) => setAmount(Number(e.target.value))}
