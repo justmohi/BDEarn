@@ -144,7 +144,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
               <div className="text-[11px] text-slate-400 font-medium">Ad Networks</div>
-              <div className="text-base sm:text-lg font-black text-cyan-400">Adsterra Compliant</div>
+              <div className="text-base sm:text-lg font-black text-cyan-400">Ad Network Compliant</div>
             </div>
           </div>
 
