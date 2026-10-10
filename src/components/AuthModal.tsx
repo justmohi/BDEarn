@@ -4,12 +4,11 @@ import {
   Mail, 
   Lock, 
   User, 
-  Sparkles, 
   AlertCircle, 
   CheckCircle2, 
   ShieldCheck 
 } from 'lucide-react';
-import { useAuth, ADMIN_BOOTSTRAP_EMAIL } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -56,7 +55,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       console.error('Auth error:', err);
       let msg = err.message || 'Authentication failed';
       if (msg.includes('user-not-found') || msg.includes('wrong-password') || msg.includes('invalid-credential')) {
-        msg = 'Invalid email or password. You can also sign in with Google or try the demo buttons.';
+        msg = 'Invalid email or password. Please check your credentials or use Forgot password.';
       } else if (msg.includes('email-already-in-use')) {
         msg = 'Email is already registered. Please sign in instead.';
       } else if (msg.includes('weak-password')) {
@@ -76,23 +75,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       onClose();
     } catch (err: any) {
       console.error('Google sign in error:', err);
-      setError(err.message || 'Google Sign-In was cancelled or failed.');
+      const code = err?.code || '';
+      if (code === 'auth/unauthorized-domain') {
+        setError('Google sign-in is not enabled for this website domain yet. Please add this Netlify domain in Firebase Console → Authentication → Settings → Authorized domains.');
+      } else {
+        setError(err.message || 'Google Sign-In was cancelled or failed.');
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  // Quick Demo credentials for evaluation
-  const setDemoPublisher = () => {
-    setEmail('demo.publisher@earnbd.com');
-    setPassword('DemoPass2026!');
-    setName('Demo Publisher');
-  };
-
-  const setDemoAdmin = () => {
-    setEmail(ADMIN_BOOTSTRAP_EMAIL);
-    setPassword('AdminSecure2026!');
-    setName('EarnBD Super Admin');
   };
 
   return (
@@ -254,30 +245,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               {t('alreadyHaveAccount')}
             </button>
           )}
-        </div>
-
-        {/* Quick Demo Pre-fill for reviewers */}
-        <div className="mt-4 p-2.5 bg-slate-900/80 rounded-xl border border-slate-800 text-[11px]">
-          <div className="text-slate-400 font-semibold mb-1.5 flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-amber-400" />
-            Quick Demo Autofill:
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={setDemoPublisher}
-              className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 transition"
-            >
-              Demo Publisher
-            </button>
-            <button
-              type="button"
-              onClick={setDemoAdmin}
-              className="px-2 py-1 bg-amber-950/40 hover:bg-amber-900/40 text-amber-300 rounded border border-amber-800/50 transition font-medium"
-            >
-              Admin ({ADMIN_BOOTSTRAP_EMAIL.split('@')[0]})
-            </button>
-          </div>
         </div>
 
       </div>
