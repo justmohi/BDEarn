@@ -55,6 +55,8 @@ import {
 import { formatBDT, isValidExternalUrl } from '../utils/security';
 import { runAllSystemTests, TestResult } from '../utils/systemTests';
 import { ReferralAdminPanel } from '../components/ReferralAdminPanel';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../firebase';
 
 const AD_CATEGORIES: AdCategory[] = [
   'Technology',
@@ -92,6 +94,7 @@ export const AdminPage: React.FC = () => {
   // Ad card form modal state
   const [editingCard, setEditingCard] = useState<Partial<AdCard> | null>(null);
   const [showAdModal, setShowAdModal] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
 
   // Commission modal
   const [showCommissionModal, setShowCommissionModal] = useState(false);
@@ -190,9 +193,19 @@ export const AdminPage: React.FC = () => {
     setIsProcessingAction(true);
     setActionError('');
     try {
-      await saveAdCard(editingCard);
+      let cardToSave = { ...editingCard };
+      if (selectedImageFile) {
+        if (!selectedImageFile.type.startsWith('image/')) throw new Error('Please choose an image file.');
+        if (selectedImageFile.size > 3 * 1024 * 1024) throw new Error('Image must be 3 MB or smaller.');
+        const safeName = selectedImageFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const objectRef = storageRef(storage, `adCards/${Date.now()}_${safeName}`);
+        const uploaded = await uploadBytes(objectRef, selectedImageFile, { contentType: selectedImageFile.type });
+        cardToSave.imageUrl = await getDownloadURL(uploaded.ref);
+      }
+      await saveAdCard(cardToSave);
       setShowAdModal(false);
       setEditingCard(null);
+      setSelectedImageFile(null);
       await loadAllAdminData();
     } catch (err: any) {
       setActionError(err.message || 'Failed to save ad card');
@@ -964,26 +977,37 @@ export const AdminPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-slate-300 font-bold block mb-1">Thumbnail Image URL</label>
-                <input
-                  type="url"
-                  value={editingCard.imageUrl || ''}
-                  onChange={(e) => setEditingCard({ ...editingCard, imageUrl: e.target.value })}
-                  placeholder="https://images.unsplash.com/photo-..."
+                <label className="text-slate-300 font-bold block mb-1">Upload Thumbnail Image (JPG, PNG, WEBP, GIF · max 3 MB)</label>
+                <input type="file" accept="image/png,image/jpeg,image/webp,image/gif"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setSelectedImageFile(file);
+                    if (file) {
+                      if (!file.type.startsWith('image/')) { setActionError('Please choose an image file.'); setSelectedImageFile(null); }
+                      else if (file.size > 3 * 1024 * 1024) { setActionError('Image must be 3 MB or smaller.'); setSelectedImageFile(null); }
+                      else { setActionError(''); setEditingCard({ ...editingCard, imageUrl: URL.createObjectURL(file) }); }
+                    }
+                  }}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-600 file:px-3 file:py-1.5 file:text-white" />
+                <p className="text-[10px] text-slate-500 mt-1">Choose an image from your phone or computer. It uploads securely when you save the card.</p>
+                <label className="text-slate-300 font-bold block mt-3 mb-1">Or use an existing Image URL</label>
+                <input type="url" value={selectedImageFile ? '' : (editingCard.imageUrl || '')}
+                  onChange={(e) => { setSelectedImageFile(null); setEditingCard({ ...editingCard, imageUrl: e.target.value }); }}
+                  placeholder="https://example.com/banner.jpg"
                   className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none font-mono"
-                  required
-                />
+                  required={!selectedImageFile} />
               </div>
 
               <div>
-                <label className="text-slate-300 font-bold block mb-1">Destination URL (Safe External Link)</label>
+                <label className="text-slate-300 font-bold block mb-1">Adsterra Direct Link / Destination URL</label>
                 <input
                   type="url"
                   value={editingCard.destinationUrl || ''}
                   onChange={(e) => setEditingCard({ ...editingCard, destinationUrl: e.target.value })}
-                  placeholder="https://advertiser-site.com"
+                  placeholder="Paste your Adsterra Direct Link (https://...)"
                   className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white outline-none font-mono"
                 />
+                <p className="text-[10px] text-slate-500 mt-1">Paste the Adsterra Direct Link here. A script/embed snippet is not a clickable destination URL.</p>
               </div>
 
               {/* Toggles */}
@@ -1024,7 +1048,7 @@ export const AdminPage: React.FC = () => {
               <div className="flex gap-3 pt-3">
                 <button
                   type="button"
-                  onClick={() => setShowAdModal(false)}
+                  onClick={() => { setShowAdModal(false); setSelectedImageFile(null); setActionError(''); }}
                   className="flex-1 py-2.5 bg-slate-800 text-slate-300 rounded-xl font-bold"
                 >
                   Cancel
