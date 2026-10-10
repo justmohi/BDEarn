@@ -1,0 +1,6 @@
+{
+  "name": "EarnBD - Bangladesh Earning & Advertising Platform",
+  "description": "Mobile-first digital advertising directory and commission platform for users in Bangladesh with bKash and Nagad withdrawals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

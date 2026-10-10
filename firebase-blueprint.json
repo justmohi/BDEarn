@@ -1,0 +1,196 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with account status and roles",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "phoneNumber": { "type": "string", "maxLength": 20 },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "status": { "type": "string", "enum": ["active", "suspended"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "role", "status"]
+    },
+    "Wallet": {
+      "title": "Wallet",
+      "description": "Financial wallet balance and ledger summary per user",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "availableBalance": { "type": "number" },
+        "reservedBalance": { "type": "number" },
+        "pendingCommission": { "type": "number" },
+        "lifetimeApproved": { "type": "number" },
+        "paidCommission": { "type": "number" },
+        "currentMonthApproved": { "type": "number" },
+        "previousMonthApproved": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "availableBalance", "reservedBalance"]
+    },
+    "AdCard": {
+      "title": "AdCard",
+      "description": "Image-based sponsored or directory advertising card",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 150 },
+        "titleBn": { "type": "string", "maxLength": 150 },
+        "description": { "type": "string", "maxLength": 500 },
+        "descriptionBn": { "type": "string", "maxLength": 500 },
+        "imageUrl": { "type": "string", "maxLength": 1024 },
+        "category": { "type": "string", "maxLength": 50 },
+        "destinationUrl": { "type": "string", "maxLength": 1024 },
+        "isSponsored": { "type": "boolean" },
+        "isActive": { "type": "boolean" },
+        "displayOrder": { "type": "number" },
+        "openInNewTab": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "category", "imageUrl", "isActive"]
+    },
+    "WithdrawalRequest": {
+      "title": "WithdrawalRequest",
+      "description": "Payout request via bKash or Nagad",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "userEmail": { "type": "string", "format": "email", "maxLength": 256 },
+        "walletType": { "type": "string", "enum": ["bKash", "Nagad"] },
+        "walletNumber": { "type": "string", "maxLength": 20 },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "processing", "approved", "paid", "rejected"] },
+        "adminNotes": { "type": "string", "maxLength": 500 },
+        "transactionRef": { "type": "string", "maxLength": 100 },
+        "requestedAt": { "type": "string" },
+        "processedAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "walletType", "walletNumber", "amount", "status", "requestedAt"]
+    },
+    "WalletTransaction": {
+      "title": "WalletTransaction",
+      "description": "Immutable ledger record for wallet operations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["commission_credit", "withdrawal_reserve", "withdrawal_payout", "withdrawal_refund", "adjustment"] },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["completed", "pending", "cancelled"] },
+        "description": { "type": "string", "maxLength": 255 },
+        "referenceId": { "type": "string", "maxLength": 128 },
+        "idempotencyKey": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "type", "amount", "status", "idempotencyKey"]
+    },
+    "MonthlyReport": {
+      "title": "MonthlyReport",
+      "description": "Monthly verified publisher revenue and distribution report",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "monthYear": { "type": "string", "maxLength": 20 },
+        "verifiedRevenue": { "type": "number" },
+        "commissionRate": { "type": "number" },
+        "distributedAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["draft", "published", "finalized"] },
+        "notes": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "monthYear", "verifiedRevenue", "commissionRate", "status"]
+    },
+    "Commission": {
+      "title": "Commission",
+      "description": "Verified monthly commission allocation per publisher",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "monthYear": { "type": "string", "maxLength": 20 },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected", "paid"] },
+        "notes": { "type": "string", "maxLength": 500 },
+        "idempotencyKey": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "monthYear", "amount", "status", "idempotencyKey"]
+    },
+    "AppSettings": {
+      "title": "AppSettings",
+      "description": "System wide configuration",
+      "type": "object",
+      "properties": {
+        "minWithdrawalAmount": { "type": "number" },
+        "commissionPercentage": { "type": "number" },
+        "allowWithdrawals": { "type": "boolean" },
+        "noticeEn": { "type": "string", "maxLength": 500 },
+        "noticeBn": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["minWithdrawalAmount", "commissionPercentage", "allowWithdrawals"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Security and administrative audit trail",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "actorId": { "type": "string", "maxLength": 128 },
+        "actorEmail": { "type": "string", "maxLength": 256 },
+        "action": { "type": "string", "maxLength": 100 },
+        "details": { "type": "string", "maxLength": 2000 },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "actorId", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile document owned by user or readable by admin"
+    },
+    "/wallets/{userId}": {
+      "schema": "Wallet",
+      "description": "User wallet ledger balances; read by user, written by server/admin"
+    },
+    "/adCards/{cardId}": {
+      "schema": "AdCard",
+      "description": "Public directory cards managed by admin"
+    },
+    "/withdrawalRequests/{requestId}": {
+      "schema": "WithdrawalRequest",
+      "description": "Payout requests submitted by user, managed by admin"
+    },
+    "/walletTransactions/{txId}": {
+      "schema": "WalletTransaction",
+      "description": "Financial transaction ledger"
+    },
+    "/monthlyReports/{reportId}": {
+      "schema": "MonthlyReport",
+      "description": "Monthly verified publisher revenue reports"
+    },
+    "/commissions/{commissionId}": {
+      "schema": "Commission",
+      "description": "User commission distributions"
+    },
+    "/appSettings/{settingId}": {
+      "schema": "AppSettings",
+      "description": "Global application configuration"
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Administrative audit logs"
+    },
+    "/admins/{adminId}": {
+      "schema": "User",
+      "description": "Admin privilege marker documents"
+    }
+  }
+}

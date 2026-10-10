@@ -1,0 +1,205 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == "mohistudio95@gmail.com" && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // 1. Users collection
+    function isValidUser(data) {
+      return data.uid is string && data.uid == request.auth.uid &&
+             data.email is string && data.email.size() <= 256 &&
+             data.role in ['user', 'admin'] &&
+             data.status in ['active', 'suspended'] &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100)) &&
+             (!('phoneNumber' in data) || (data.phoneNumber is string && data.phoneNumber.size() <= 20));
+    }
+
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      
+      // On creation, normal users can only set role to 'user' and status to 'active'
+      allow create: if isValidId(userId) && isOwner(userId) && isValidUser(incoming()) &&
+                    incoming().role == 'user' &&
+                    incoming().status == 'active';
+
+      // Updates: Admins can update roles/status; owners can update profile info but cannot change role, status, or uid
+      allow update: if isValidId(userId) && (
+        isAdmin() ||
+        (
+          isOwner(userId) &&
+          isValidUser(incoming()) &&
+          incoming().uid == existing().uid &&
+          incoming().role == existing().role &&
+          incoming().status == existing().status &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'phoneNumber', 'updatedAt'])
+        )
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // 2. Wallets collection: Strictly owned, only updated by Admin or strictly conserved user reserve action
+    function isValidWallet(data) {
+      return data.uid is string &&
+             data.availableBalance is number && data.availableBalance >= 0 &&
+             data.reservedBalance is number && data.reservedBalance >= 0 &&
+             (!('pendingCommission' in data) || data.pendingCommission is number) &&
+             (!('lifetimeApproved' in data) || data.lifetimeApproved is number) &&
+             (!('paidCommission' in data) || data.paidCommission is number);
+    }
+
+    match /wallets/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+
+      // Regular users can only initialize an empty wallet
+      allow create: if isValidId(userId) && (
+        isAdmin() || 
+        (isOwner(userId) && incoming().availableBalance == 0 && incoming().reservedBalance == 0)
+      ) && isValidWallet(incoming());
+
+      // Update: Admin can update balances. Owner can ONLY move money to reservedBalance for >= 5000 payout
+      // Mathematical conservation invariant: (available + reserved) cannot increase!
+      allow update: if isValidId(userId) && (
+        isAdmin() ||
+        (
+          isOwner(userId) &&
+          isValidWallet(incoming()) &&
+          incoming().uid == existing().uid &&
+          incoming().availableBalance + incoming().reservedBalance == existing().availableBalance + existing().reservedBalance &&
+          incoming().availableBalance < existing().availableBalance &&
+          (existing().availableBalance - incoming().availableBalance) >= 5000 &&
+          existing().availableBalance >= 5000 &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['availableBalance', 'reservedBalance', 'updatedAt'])
+        )
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // 3. Ad Cards: Public read for active, full control for Admin
+    function isValidAdCard(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.title is string && data.title.size() <= 150 &&
+             data.category is string && data.category.size() <= 50 &&
+             data.imageUrl is string && data.imageUrl.size() <= 1024 &&
+             data.isActive is bool &&
+             (!('destinationUrl' in data) || (data.destinationUrl is string && data.destinationUrl.size() <= 1024)) &&
+             (!('isSponsored' in data) || data.isSponsored is bool) &&
+             (!('displayOrder' in data) || data.displayOrder is number);
+    }
+
+    match /adCards/{cardId} {
+      allow get: if isValidId(cardId);
+      allow list: if true;
+      allow create, update, delete: if isAdmin() && (request.method == 'delete' || isValidAdCard(incoming()));
+    }
+
+    // 4. Withdrawal Requests
+    function isValidWithdrawalRequest(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId.size() <= 128 &&
+             data.walletType in ['bKash', 'Nagad'] &&
+             data.walletNumber is string && data.walletNumber.size() >= 11 && data.walletNumber.size() <= 20 &&
+             data.amount is number && data.amount >= 5000 &&
+             data.status in ['pending', 'processing', 'approved', 'paid', 'rejected'];
+    }
+
+    match /withdrawalRequests/{requestId} {
+      allow get: if isValidId(requestId) && (isAdmin() || (isSignedIn() && existing().userId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+
+      // Normal user can submit a pending withdrawal request for themselves of >= 5000
+      allow create: if isValidId(requestId) && isSignedIn() &&
+                    isValidWithdrawalRequest(incoming()) &&
+                    incoming().userId == request.auth.uid &&
+                    incoming().status == 'pending' &&
+                    incoming().amount >= 5000;
+
+      // Updates: only Admin can change status, transactionRef, adminNotes
+      allow update: if isValidId(requestId) && isAdmin() && isValidWithdrawalRequest(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // 5. Wallet Transactions: Immutable audit records
+    match /walletTransactions/{txId} {
+      allow get: if isValidId(txId) && (isAdmin() || (isSignedIn() && existing().userId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      
+      // Admin can record any transaction. User can only record withdrawal_reserve
+      allow create: if isAdmin() || (
+        isSignedIn() &&
+        incoming().userId == request.auth.uid &&
+        incoming().type == 'withdrawal_reserve' &&
+        incoming().status == 'completed' &&
+        incoming().amount >= 5000
+      );
+      allow update, delete: if isAdmin();
+    }
+
+    // 6. Monthly Reports
+    match /monthlyReports/{reportId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 7. Commissions
+    match /commissions/{commissionId} {
+      allow get: if isValidId(commissionId) && (isAdmin() || (isSignedIn() && existing().userId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 8. App Settings
+    match /appSettings/{settingId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 9. Audit Logs
+    match /auditLogs/{logId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin() || isSignedIn();
+      allow update, delete: if false; // Immutable audit log
+    }
+
+    // 10. Admins
+    match /admins/{adminId} {
+      allow get: if isSignedIn();
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}
