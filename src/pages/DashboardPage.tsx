@@ -218,11 +218,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
       </div>
 
-      {/* Demo-only reward estimate; deliberately separate from the withdrawable wallet. */}
-      <div className="bg-slate-900/90 border border-amber-500/20 p-5 rounded-2xl flex items-center justify-between gap-4">
-        <div>
-          <div className="text-xs font-medium text-amber-300 mb-2">Demo Reward (Not Withdrawable)</div>
-          <div className="text-2xl font-black text-amber-300">{'
+      {/* 2. STATS & EARNINGS METRICS GRID */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         
         {/* Available Balance */}
@@ -503,16 +499,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     </div>
   );
 };
-}{(adImageClicks * 0.001).toFixed(3)}</div>
-          <p className="text-[11px] text-slate-500 mt-1">$0.001 per recorded ad-image click · demo display only</p>
-        </div>
-        <div className="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-300 flex items-center justify-center">
-          <Wallet className="w-5 h-5" />
-        </div>
-      </div>
-
-      {/* 2. STATS & EARNINGS METRICS GRID */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         
         {/* Available Balance */}
         <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl">
