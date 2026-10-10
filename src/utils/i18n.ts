@@ -29,7 +29,7 @@ export const translations = {
     
     // Notice
     policyNoticeTitle: 'Zero-Fraud & Compliance Guarantee',
-    policyNoticeText: 'EarnBD operates strictly in compliance with Adsterra and global ad networks. We DO NOT permit paid-to-click, forced ad views, automated bots, or incentivized clicks. Commissions are allocated only from verified net publisher revenue.',
+    policyNoticeText: 'EarnBD operates strictly in compliance with advertising networks and global ad networks. We DO NOT permit paid-to-click, forced ad views, automated bots, or incentivized clicks. Commissions are allocated only from verified net publisher revenue.',
 
     // Directory
     directoryTitle: 'Featured Advertisers & Sponsor Directory',
@@ -162,7 +162,7 @@ export const translations = {
 
     // Notice
     policyNoticeTitle: 'জিরো-ফ্রড ও নীতি মেনে চলার নিশ্চয়তা',
-    policyNoticeText: 'EarnBD সম্পূর্ণভাবে Adsterra ও আন্তর্জাতিক অ্যাড নেটওয়ার্ক নীতিমালা মেনে পরিচালিত। আমরা পেইড-টু-ক্লিক, জোরপূর্বক বিজ্ঞাপন দেখানো বা কোনো অটোক্লিক সমর্থন করি না। কেবল অনুমোদিত নিট রাজস্ব থেকে কমিশন বণ্টন করা হয়।',
+    policyNoticeText: 'EarnBD সম্পূর্ণভাবে advertising networks ও আন্তর্জাতিক অ্যাড নেটওয়ার্ক নীতিমালা মেনে পরিচালিত। আমরা পেইড-টু-ক্লিক, জোরপূর্বক বিজ্ঞাপন দেখানো বা কোনো অটোক্লিক সমর্থন করি না। কেবল অনুমোদিত নিট রাজস্ব থেকে কমিশন বণ্টন করা হয়।',
 
     // Directory
     directoryTitle: 'যাচাইকৃত বিজ্ঞাপনদাতা ও স্পনসর ডিরেক্টরি',
