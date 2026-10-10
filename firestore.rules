@@ -135,13 +135,22 @@ service cloud.firestore {
     match /adClickStats/{userId} {
       allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
       allow list: if isAdmin();
-      allow create, update: if isValidId(userId) && isOwner(userId) &&
+      allow create: if isValidId(userId) && isOwner(userId) &&
         incoming().uid == request.auth.uid &&
-        incoming().totalClicks is number && incoming().totalClicks >= 1 &&
-        incoming().totalClicks <= 1000000000 &&
-        incoming().lastClickedAdId is string && incoming().lastClickedAdId.size() <= 128 &&
+        incoming().totalClicks == 1 &&
+        incoming().lastClickedAdId is string && incoming().lastClickedAdId.size() > 0 && incoming().lastClickedAdId.size() <= 128 &&
+        incoming().lastClickedAt is timestamp &&
         incoming().keys().hasOnly(['uid', 'totalClicks', 'lastClickedAdId', 'lastClickedAt']) &&
         incoming().keys().hasAll(['uid', 'totalClicks', 'lastClickedAdId', 'lastClickedAt']);
+      allow update: if isValidId(userId) && isOwner(userId) &&
+        incoming().uid == request.auth.uid &&
+        existing().totalClicks is number &&
+        incoming().totalClicks == existing().totalClicks + 1 &&
+        incoming().totalClicks <= 1000000000 &&
+        incoming().lastClickedAdId is string && incoming().lastClickedAdId.size() > 0 && incoming().lastClickedAdId.size() <= 128 &&
+        incoming().lastClickedAt is timestamp &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['totalClicks', 'lastClickedAdId', 'lastClickedAt']) &&
+        incoming().keys().hasOnly(['uid', 'totalClicks', 'lastClickedAdId', 'lastClickedAt']);
       allow delete: if isAdmin();
     }
 
