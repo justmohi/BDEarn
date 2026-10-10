@@ -93,7 +93,7 @@ service cloud.firestore {
         (isOwner(userId) && incoming().availableBalance == 0 && incoming().reservedBalance == 0)
       ) && isValidWallet(incoming());
 
-      // Update: Admin can update balances. Owner can ONLY move money to reservedBalance for >= 3000 payout
+      // Update: Admin can update balances. Owner can ONLY move money to reservedBalance for >= 5000 payout
       // Mathematical conservation invariant: (available + reserved) cannot increase!
       allow update: if isValidId(userId) && (
         isAdmin() ||
