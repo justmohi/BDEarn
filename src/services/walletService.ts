@@ -36,11 +36,15 @@ export interface SubmitWithdrawalParams {
 export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): Promise<{ requestId: string; transactionId: string }> {
   const { userId, userEmail, walletType, walletNumber, amount } = params;
 
-  if (amount < MIN_WITHDRAWAL_BDT) {
-    throw new Error(`Minimum withdrawal amount is BDT ৳${MIN_WITHDRAWAL_BDT}.`);
+  if (!Number.isSafeInteger(amount) || amount < MIN_WITHDRAWAL_BDT) {
+    throw new Error(`Enter a whole-number withdrawal amount of at least BDT ৳${MIN_WITHDRAWAL_BDT}.`);
   }
 
-  if (!isValidBdMobileNumber(walletNumber)) {
+  if (walletType !== 'bKash' && walletType !== 'Nagad') {
+    throw new Error('Choose a valid payout method: bKash or Nagad.');
+  }
+
+  if (!userId || !isValidBdMobileNumber(walletNumber)) {
     throw new Error('Please enter a valid 11-digit Bangladeshi mobile number (013-019).');
   }
 
@@ -61,11 +65,11 @@ export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): P
       const pendingQuery = query(
         collection(db, 'withdrawalRequests'),
         where('userId', '==', userId),
-        where('status', '==', 'pending')
+        where('status', 'in', ['pending', 'processing', 'approved'])
       );
       const pendingSnap = await tx.get(pendingQuery);
       if (!pendingSnap.empty) {
-        throw new Error('You already have a pending withdrawal request in queue. Please wait for administration to process it.');
+        throw new Error('You already have a withdrawal request awaiting processing. Please wait for administration to complete it.');
       }
 
       const walletData = walletSnap.data() as UserWallet;
