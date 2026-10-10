@@ -10,7 +10,6 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { AdCard } from '../types';
-import { INITIAL_AD_CARDS } from '../utils/initialAds';
 import { isValidExternalUrl } from '../utils/security';
 
 export async function fetchAllAdCards(): Promise<AdCard[]> {
@@ -19,32 +18,10 @@ export async function fetchAllAdCards(): Promise<AdCard[]> {
     const q = query(cardsCol, orderBy('displayOrder', 'asc'));
     const snapshot = await getDocs(q);
 
-    if (snapshot.empty) {
-      // Seed initial cards automatically
-      await seedInitialAdCards();
-      const newSnapshot = await getDocs(q);
-      return newSnapshot.docs.map(d => d.data() as AdCard);
-    }
-
     return snapshot.docs.map(d => d.data() as AdCard);
   } catch (err) {
-    console.warn('Error fetching ad cards, falling back to initial data:', err);
-    return INITIAL_AD_CARDS.map(card => ({
-      ...card,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }));
-  }
-}
-
-export async function seedInitialAdCards(): Promise<void> {
-  for (const card of INITIAL_AD_CARDS) {
-    const cardRef = doc(db, 'adCards', card.id);
-    await setDoc(cardRef, {
-      ...card,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }, { merge: true });
+    console.error('Error fetching ad cards from Firestore:', err);
+    return [];
   }
 }
 
