@@ -19,7 +19,7 @@ import {
 } from '../types';
 import { generateIdempotencyKey, isValidBdMobileNumber } from '../utils/security';
 
-export const MIN_WITHDRAWAL_BDT = 3000;
+export const MIN_WITHDRAWAL_BDT = 5000;
 
 export interface SubmitWithdrawalParams {
   userId: string;
@@ -44,17 +44,6 @@ export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): P
     throw new Error('Please enter a valid 11-digit Bangladeshi mobile number (013-019).');
   }
 
-  // Prevent duplicate withdrawal requests while one is pending
-  const existingPendingQuery = query(
-    collection(db, 'withdrawalRequests'),
-    where('userId', '==', userId),
-    where('status', '==', 'pending')
-  );
-  const pendingDocs = await getDocs(existingPendingQuery);
-  if (!pendingDocs.empty) {
-    throw new Error('You already have a pending withdrawal request in queue. Please wait for administration to process it.');
-  }
-
   const requestId = `wreq_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const idempotencyKey = generateIdempotencyKey('wdraw_res', userId);
   const transactionId = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
@@ -66,6 +55,17 @@ export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): P
 
       if (!walletSnap.exists()) {
         throw new Error('Wallet not found for this account.');
+      }
+
+      // Read pending requests inside the same transaction to prevent concurrent duplicate submissions.
+      const pendingQuery = query(
+        collection(db, 'withdrawalRequests'),
+        where('userId', '==', userId),
+        where('status', '==', 'pending')
+      );
+      const pendingSnap = await tx.get(pendingQuery);
+      if (!pendingSnap.empty) {
+        throw new Error('You already have a pending withdrawal request in queue. Please wait for administration to process it.');
       }
 
       const walletData = walletSnap.data() as UserWallet;
@@ -164,13 +164,18 @@ export async function completeWithdrawalPayout(
       const walletRef = doc(db, 'wallets', reqData.userId);
       const walletSnap = await tx.get(walletRef);
 
-      if (walletSnap.exists()) {
-        const walletData = walletSnap.data() as UserWallet;
-        const currentReserved = walletData.reservedBalance || 0;
-        const currentPaid = walletData.paidCommission || 0;
+      if (!walletSnap.exists()) {
+        throw new Error('Wallet not found for this withdrawal request.');
+      }
+      const walletData = walletSnap.data() as UserWallet;
+      const currentReserved = walletData.reservedBalance || 0;
+      if (currentReserved < reqData.amount) {
+        throw new Error('Reserved balance is inconsistent; payout was not marked as paid.');
+      }
+      const currentPaid = walletData.paidCommission || 0;
 
-        tx.update(walletRef, {
-          reservedBalance: Math.max(0, currentReserved - reqData.amount),
+      tx.update(walletRef, {
+          reservedBalance: currentReserved - reqData.amount,
           paidCommission: currentPaid + reqData.amount,
           updatedAt: new Date().toISOString()
         });
@@ -251,14 +256,19 @@ export async function rejectWithdrawalPayout(
       const walletRef = doc(db, 'wallets', reqData.userId);
       const walletSnap = await tx.get(walletRef);
 
-      if (walletSnap.exists()) {
-        const walletData = walletSnap.data() as UserWallet;
-        const currentReserved = walletData.reservedBalance || 0;
-        const currentAvailable = walletData.availableBalance || 0;
+      if (!walletSnap.exists()) {
+        throw new Error('Wallet not found for this withdrawal request; refund was not processed.');
+      }
+      const walletData = walletSnap.data() as UserWallet;
+      const currentReserved = walletData.reservedBalance || 0;
+      const currentAvailable = walletData.availableBalance || 0;
+      if (currentReserved < reqData.amount) {
+        throw new Error('Reserved balance is inconsistent; refund was not processed.');
+      }
 
-        // Refund reserved amount back to available balance!
-        tx.update(walletRef, {
-          reservedBalance: Math.max(0, currentReserved - reqData.amount),
+      // Refund reserved amount back to available balance.
+      tx.update(walletRef, {
+          reservedBalance: currentReserved - reqData.amount,
           availableBalance: currentAvailable + reqData.amount,
           updatedAt: new Date().toISOString()
         });
