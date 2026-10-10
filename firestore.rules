@@ -127,6 +127,21 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin() && (request.method == 'delete' || isValidAdCard(incoming()));
     }
 
+    // 3A. Ad image/card click statistics.
+    // Users can only write/read their own click counter; this is a UI metric, not verified ad-network billing data.
+    match /adClickStats/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create, update: if isValidId(userId) && isOwner(userId) &&
+        incoming().uid == request.auth.uid &&
+        incoming().totalClicks is number && incoming().totalClicks >= 1 &&
+        incoming().totalClicks <= 1000000000 &&
+        incoming().lastClickedAdId is string && incoming().lastClickedAdId.size() <= 128 &&
+        incoming().diff(resource == null ? {} : existing()).affectedKeys()
+          .hasOnly(['uid', 'totalClicks', 'lastClickedAdId', 'lastClickedAt']);
+      allow delete: if isAdmin();
+    }
+
     // 4. Withdrawal Requests
     function isValidWithdrawalRequest(data) {
       return data.id is string && data.id.size() <= 128 &&
