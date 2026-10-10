@@ -34,11 +34,11 @@ async function authenticate(event: any) {
   if (!match) throw Object.assign(new Error('Authentication required.'), { statusCode: 401 });
   const { adminAuth } = getAdminServices();
   const decoded = await adminAuth.verifyIdToken(match[1], true);
-  return { uid: decoded.uid, email: decoded.email || '' };
+  return { uid: decoded.uid, email: decoded.email || '', emailVerified: decoded.email_verified === true };
 }
 
-async function isAdmin(uid: string, email: string, db: FirebaseFirestore.Firestore) {
-  if (email.toLowerCase() === 'mohistudio95@gmail.com') return true;
+async function isAdmin(uid: string, email: string, emailVerified: boolean, db: FirebaseFirestore.Firestore) {
+  if (email.toLowerCase() === 'mohistudio95@gmail.com' && emailVerified) return true;
   const adminDoc = await db.doc(`admins/${uid}`).get();
   return adminDoc.exists && adminDoc.data()?.admin === true;
 }
@@ -123,7 +123,7 @@ export async function handler(event: any) {
     if (!['list', 'approve', 'reject'].includes(action)) {
       return json(400, { error: 'Unsupported referral action.' });
     }
-    if (!(await isAdmin(identity.uid, identity.email, db))) {
+    if (!(await isAdmin(identity.uid, identity.email, identity.emailVerified, db))) {
       return json(403, { error: 'Administrator permission required.' });
     }
 
