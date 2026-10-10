@@ -165,7 +165,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-pink-400 mb-1">
               <ShieldCheck className="w-4 h-4" />
-              <span>{t('withdrawalGoalTitle')} (৳5,000 BDT)</span>
+              <span>{t('withdrawalGoalTitle')} (৳3,000 BDT)</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-black text-white">
               {isEligibleForWithdrawal ? (
@@ -187,11 +187,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
         </div>
 
-        {/* Progress bar towards ৳5,000 */}
+        {/* Progress bar towards ৳3,000 */}
         <div className="space-y-2">
           <div className="flex justify-between text-xs font-semibold text-slate-300">
             <span>Current: {formatBDT(availableBalance)}</span>
-            <span>Target: ৳5,000 BDT ({progressPercent}%)</span>
+            <span>Target: ৳3,000 BDT ({progressPercent}%)</span>
           </div>
           <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
             <div 
@@ -345,7 +345,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 <ArrowDownCircle className="w-8 h-8 mx-auto mb-2 text-slate-600" />
                 <p className="text-sm font-medium">{t('noWithdrawalsYet')}</p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Once your balance reaches ৳5,000, you can request bKash or Nagad payouts here.
+                  Once your balance reaches ৳3,000, you can request bKash or Nagad payouts here.
                 </p>
               </div>
             ) : (
