@@ -48,6 +48,17 @@ export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): P
     throw new Error('Please enter a valid 11-digit Bangladeshi mobile number (013-019).');
   }
 
+  // Fast pre-check for legacy active requests. The wallet lock below closes concurrent-submit races.
+  const existingActiveQuery = query(
+    collection(db, 'withdrawalRequests'),
+    where('userId', '==', userId),
+    where('status', 'in', ['pending', 'processing', 'approved'])
+  );
+  const existingActive = await getDocs(existingActiveQuery);
+  if (!existingActive.empty) {
+    throw new Error('You already have a withdrawal request awaiting processing. Please wait for administration to complete it.');
+  }
+
   const requestId = `wreq_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const idempotencyKey = generateIdempotencyKey('wdraw_res', userId);
   const transactionId = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
@@ -61,18 +72,11 @@ export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): P
         throw new Error('Wallet not found for this account.');
       }
 
-      // Read pending requests inside the same transaction to prevent concurrent duplicate submissions.
-      const pendingQuery = query(
-        collection(db, 'withdrawalRequests'),
-        where('userId', '==', userId),
-        where('status', 'in', ['pending', 'processing', 'approved'])
-      );
-      const pendingSnap = await tx.get(pendingQuery);
-      if (!pendingSnap.empty) {
+      const walletData = walletSnap.data() as UserWallet;
+      const activeRequestId = walletSnap.data().activeWithdrawalRequestId as string | null | undefined;
+      if (activeRequestId) {
         throw new Error('You already have a withdrawal request awaiting processing. Please wait for administration to complete it.');
       }
-
-      const walletData = walletSnap.data() as UserWallet;
       const currentAvailable = walletData.availableBalance || 0;
 
       if (currentAvailable < MIN_WITHDRAWAL_BDT) {
@@ -93,6 +97,7 @@ export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): P
       tx.update(walletRef, {
         availableBalance: newAvailable,
         reservedBalance: newReserved,
+        activeWithdrawalRequestId: requestId,
         updatedAt: new Date().toISOString()
       });
 
@@ -181,6 +186,7 @@ export async function completeWithdrawalPayout(
       tx.update(walletRef, {
         reservedBalance: currentReserved - reqData.amount,
         paidCommission: currentPaid + reqData.amount,
+        activeWithdrawalRequestId: null,
         updatedAt: new Date().toISOString()
       });
 
@@ -273,6 +279,7 @@ export async function rejectWithdrawalPayout(
       tx.update(walletRef, {
         reservedBalance: currentReserved - reqData.amount,
         availableBalance: currentAvailable + reqData.amount,
+        activeWithdrawalRequestId: null,
         updatedAt: new Date().toISOString()
       });
 
