@@ -8,8 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
-  sendEmailVerification,
-  getAdditionalUserInfo
+  sendEmailVerification
 } from 'firebase/auth';
 import { 
   doc, 
@@ -110,7 +109,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const isBootstrapAdmin = fbUser.email?.toLowerCase() === ADMIN_BOOTSTRAP_EMAIL.toLowerCase() && Boolean(fbUser.emailVerified);
 
       let profileData: UserProfile;
-      const isNewProfile = !userSnap.exists();
 
       if (!userSnap.exists()) {
         profileData = {
