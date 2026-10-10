@@ -90,7 +90,7 @@ service cloud.firestore {
         (isOwner(userId) && incoming().availableBalance == 0 && incoming().reservedBalance == 0)
       ) && isValidWallet(incoming());
 
-      // Update: Admin can update balances. Owner can ONLY move money to reservedBalance for >= 5000 payout
+      // Update: Admin can update balances. Owner can ONLY move money to reservedBalance for >= 3000 payout
       // Mathematical conservation invariant: (available + reserved) cannot increase!
       allow update: if isValidId(userId) && (
         isAdmin() ||
@@ -100,8 +100,8 @@ service cloud.firestore {
           incoming().uid == existing().uid &&
           incoming().availableBalance + incoming().reservedBalance == existing().availableBalance + existing().reservedBalance &&
           incoming().availableBalance < existing().availableBalance &&
-          (existing().availableBalance - incoming().availableBalance) >= 5000 &&
-          existing().availableBalance >= 5000 &&
+          (existing().availableBalance - incoming().availableBalance) >= 3000 &&
+          existing().availableBalance >= 3000 &&
           incoming().diff(existing()).affectedKeys().hasOnly(['availableBalance', 'reservedBalance', 'updatedAt'])
         )
       );
@@ -148,7 +148,7 @@ service cloud.firestore {
              data.userId is string && data.userId.size() <= 128 &&
              data.walletType in ['bKash', 'Nagad'] &&
              data.walletNumber is string && data.walletNumber.size() >= 11 && data.walletNumber.size() <= 20 &&
-             data.amount is number && data.amount >= 5000 &&
+             data.amount is number && data.amount >= 3000 &&
              data.status in ['pending', 'processing', 'approved', 'paid', 'rejected'];
     }
 
@@ -161,7 +161,7 @@ service cloud.firestore {
                     isValidWithdrawalRequest(incoming()) &&
                     incoming().userId == request.auth.uid &&
                     incoming().status == 'pending' &&
-                    incoming().amount >= 5000;
+                    incoming().amount >= 3000;
 
       // Updates: only Admin can change status, transactionRef, adminNotes
       allow update: if isValidId(requestId) && isAdmin() && isValidWithdrawalRequest(incoming());
