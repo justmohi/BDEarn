@@ -19,7 +19,8 @@ import {
   ExternalLink,
   Layers,
   Sliders,
-  Play
+  Play,
+  Gift
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { 
@@ -53,6 +54,7 @@ import {
 } from '../services/adService';
 import { formatBDT, isValidExternalUrl } from '../utils/security';
 import { runAllSystemTests, TestResult } from '../utils/systemTests';
+import { ReferralAdminPanel } from '../components/ReferralAdminPanel';
 
 const AD_CATEGORIES: AdCategory[] = [
   'Technology',
@@ -70,7 +72,7 @@ const AD_CATEGORIES: AdCategory[] = [
 export const AdminPage: React.FC = () => {
   const { currentUser, isAdmin, t } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'withdrawals' | 'ads' | 'revenue' | 'users' | 'audit' | 'tests'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'withdrawals' | 'ads' | 'revenue' | 'users' | 'audit' | 'tests' | 'referrals'>('overview');
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -296,6 +298,7 @@ export const AdminPage: React.FC = () => {
           { id: 'ads', label: t('tabAds'), icon: Sparkles },
           { id: 'revenue', label: t('tabCommissions'), icon: DollarSign },
           { id: 'users', label: `${t('tabUsers')} (${users.length})`, icon: Users },
+          { id: 'referrals', label: 'Referrals', icon: Gift },
           { id: 'audit', label: t('tabAudit'), icon: FileText },
           { id: 'tests', label: t('tabTests'), icon: Play },
         ].map(tab => {
@@ -754,6 +757,8 @@ export const AdminPage: React.FC = () => {
       )}
 
       {/* 7. SYSTEM & RULES TESTS TAB */}
+      {activeTab === 'referrals' && <ReferralAdminPanel />}
+
       {activeTab === 'tests' && (
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
           <div className="flex items-center justify-between">
