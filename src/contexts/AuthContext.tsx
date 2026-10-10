@@ -8,7 +8,8 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
-  sendEmailVerification
+  sendEmailVerification,
+  getAdditionalUserInfo
 } from 'firebase/auth';
 import { 
   doc, 
@@ -62,6 +63,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    // Preserve a valid referral code while the visitor moves through registration.
+    if (typeof window !== 'undefined') {
+      const incomingRef = new URLSearchParams(window.location.search).get('ref');
+      if (incomingRef && /^[A-Za-z0-9_-]{20,128}$/.test(incomingRef)) {
+        window.sessionStorage.setItem('earnbd_referral_code', incomingRef);
+      }
+    }
     testFirestoreConnection();
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (fbUser) => {
@@ -102,6 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const isBootstrapAdmin = fbUser.email?.toLowerCase() === ADMIN_BOOTSTRAP_EMAIL.toLowerCase() && Boolean(fbUser.emailVerified);
 
       let profileData: UserProfile;
+      const isNewProfile = !userSnap.exists();
 
       if (!userSnap.exists()) {
         profileData = {
@@ -150,10 +159,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         setWallet(walletSnap.data() as UserWallet);
       }
+
+      // Referral attribution is processed only by the trusted Netlify function.
+      // The function verifies the Firebase ID token and the 30-day bonus stays pending.
+      await claimReferralIfPresent(fbUser);
     } catch (err) {
       console.error('Failed to initialize user profile or wallet:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const claimReferralIfPresent = async (fbUser: FirebaseUser) => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const code = window.sessionStorage.getItem('earnbd_referral_code') || params.get('ref');
+    if (!code || !/^[A-Za-z0-9_-]{20,128}$/.test(code)) return;
+
+    try {
+      const token = await fbUser.getIdToken();
+      const response = await fetch('/.netlify/functions/referral', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'claim', referrerUid: code })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok) {
+        window.sessionStorage.removeItem('earnbd_referral_code');
+      } else if (response.status < 500) {
+        // Do not keep an invalid or ineligible code retrying forever.
+        window.sessionStorage.removeItem('earnbd_referral_code');
+        console.warn('Referral attribution was not accepted:', data.error || response.statusText);
+      } else {
+        console.warn('Referral service temporarily unavailable; code retained for retry.');
+      }
+    } catch (error) {
+      console.warn('Referral claim could not be submitted:', error);
     }
   };
 
