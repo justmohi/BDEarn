@@ -16,6 +16,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { AdCard, AdCategory } from '../types';
 import { fetchAllAdCards } from '../services/adService';
 import { AdCardItem } from '../components/AdCardItem';
+import { WebsiteAdSlot } from '../components/WebsiteAdSlot';
 
 const CATEGORIES: ('All' | AdCategory)[] = [
   'All',
@@ -178,6 +179,9 @@ export const HomePage: React.FC<HomePageProps> = ({
           </button>
         </div>
       </section>
+
+      {/* Website AdSense placement; enabled only after AdSense IDs are configured. */}
+      <WebsiteAdSlot />
 
       {/* 3. DIRECTORY & IMAGE CARDS GRID */}
       <section id="directory-section" className="space-y-6">
