@@ -218,6 +218,299 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
       </div>
 
+      {/* Demo-only reward estimate; deliberately separate from the withdrawable wallet. */}
+      <div className="bg-slate-900/90 border border-amber-500/20 p-5 rounded-2xl flex items-center justify-between gap-4">
+        <div>
+          <div className="text-xs font-medium text-amber-300 mb-2">Demo Reward (Not Withdrawable)</div>
+          <div className="text-2xl font-black text-amber-300">{'
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        
+        {/* Available Balance */}
+        <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-medium">{t('withdrawableBalance')}</span>
+            <Wallet className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div className="text-xl sm:text-2xl font-black text-emerald-400">
+            {formatBDT(availableBalance)}
+          </div>
+          <div className="text-[11px] text-slate-400 mt-1">Ready for bKash/Nagad</div>
+        </div>
+
+        {/* Reserved in Processing */}
+        <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-medium">Reserved in Processing</span>
+            <Clock className="w-4 h-4 text-amber-400" />
+          </div>
+          <div className="text-xl sm:text-2xl font-black text-amber-400">
+            {formatBDT(reservedBalance)}
+          </div>
+          <div className="text-[11px] text-slate-400 mt-1">Pending payout transfer</div>
+        </div>
+
+        {/* Lifetime Approved */}
+        <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-medium">{t('lifetimeApproved')}</span>
+            <TrendingUp className="w-4 h-4 text-cyan-400" />
+          </div>
+          <div className="text-xl sm:text-2xl font-black text-white">
+            {formatBDT(lifetimeApproved)}
+          </div>
+          <div className="text-[11px] text-slate-400 mt-1">Cumulative audited earnings</div>
+        </div>
+
+        {/* Paid Commission */}
+        <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-medium">{t('paidCommission')}</span>
+            <CheckCircle2 className="w-4 h-4 text-pink-400" />
+          </div>
+          <div className="text-xl sm:text-2xl font-black text-pink-400">
+            {formatBDT(paidCommission)}
+          </div>
+          <div className="text-[11px] text-slate-400 mt-1">Dispatched via mobile wallets</div>
+        </div>
+
+        {/* Current Month Approved */}
+        <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-medium">{t('currentMonthEarnings')}</span>
+            <Calendar className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div className="text-xl sm:text-2xl font-black text-slate-200">
+            {formatBDT(currentMonthApproved)}
+          </div>
+          <div className="text-[11px] text-slate-400 mt-1">October 2026 share</div>
+        </div>
+
+        {/* Previous Month Carryover */}
+        <div className="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-medium">{t('previousMonthEarnings')}</span>
+            <Layers className="w-4 h-4 text-indigo-400" />
+          </div>
+          <div className="text-xl sm:text-2xl font-black text-slate-200">
+            {formatBDT(previousMonthApproved)}
+          </div>
+          <div className="text-[11px] text-slate-400 mt-1">Rolled into current balance</div>
+        </div>
+
+      </div>
+
+      {/* 3. TABS: WITHDRAWAL HISTORY, TRANSACTIONS & MONTHLY STATEMENT */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl">
+        <div className="flex items-center gap-2 border-b border-slate-800 pb-3 mb-5 overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('withdrawals')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 ${
+              activeTab === 'withdrawals'
+                ? 'bg-slate-800 text-emerald-400 border border-emerald-500/30'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <ArrowDownCircle className="w-4 h-4" />
+            <span>{t('withdrawalHistory')} ({withdrawals.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('transactions')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 ${
+              activeTab === 'transactions'
+                ? 'bg-slate-800 text-emerald-400 border border-emerald-500/30'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>{t('transactionHistory')} ({transactions.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('statement')}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 ${
+              activeTab === 'statement'
+                ? 'bg-slate-800 text-emerald-400 border border-emerald-500/30'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Calendar className="w-4 h-4" />
+            <span>{t('monthlyStatements')}</span>
+          </button>
+        </div>
+
+        {/* Tab 1: Withdrawal Requests */}
+        {activeTab === 'withdrawals' && (
+          <div>
+            {loadingHistory ? (
+              <div className="py-8 text-center text-slate-500 text-xs">Loading requests...</div>
+            ) : withdrawals.length === 0 ? (
+              <div className="py-10 text-center text-slate-400">
+                <ArrowDownCircle className="w-8 h-8 mx-auto mb-2 text-slate-600" />
+                <p className="text-sm font-medium">{t('noWithdrawalsYet')}</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  Once your balance reaches ৳3,000, you can request bKash or Nagad payouts here.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-slate-300">
+                  <thead className="bg-slate-950/60 text-slate-400 uppercase text-[10px] tracking-wider font-bold">
+                    <tr>
+                      <th className="p-3">Date</th>
+                      <th className="p-3">Wallet</th>
+                      <th className="p-3">Account Number</th>
+                      <th className="p-3">Amount</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3">TrxID / Note</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800">
+                    {withdrawals.map((w) => (
+                      <tr key={w.id} className="hover:bg-slate-800/40 transition">
+                        <td className="p-3 whitespace-nowrap text-slate-400">
+                          {new Date(w.requestedAt).toLocaleDateString()}
+                        </td>
+                        <td className="p-3 font-bold text-white flex items-center gap-1.5">
+                          <span className={`w-2 h-2 rounded-full ${w.walletType === 'bKash' ? 'bg-[#e2136e]' : 'bg-[#f7931e]'}`} />
+                          {w.walletType}
+                        </td>
+                        <td className="p-3 font-mono text-emerald-400 font-medium">
+                          {w.walletNumber}
+                        </td>
+                        <td className="p-3 font-extrabold text-white">
+                          {formatBDT(w.amount)}
+                        </td>
+                        <td className="p-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                            w.status === 'paid' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                            w.status === 'rejected' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                            w.status === 'processing' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' :
+                            'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          }`}>
+                            {w.status}
+                          </span>
+                        </td>
+                        <td className="p-3 text-slate-400 font-mono text-[11px]">
+                          {w.transactionRef ? (
+                            <span className="text-emerald-400 font-bold">TrxID: {w.transactionRef}</span>
+                          ) : w.adminNotes ? (
+                            <span className="text-red-400">{w.adminNotes}</span>
+                          ) : (
+                            <span className="text-slate-500">In Queue</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 2: Transactions Ledger */}
+        {activeTab === 'transactions' && (
+          <div>
+            {loadingHistory ? (
+              <div className="py-8 text-center text-slate-500 text-xs">Loading ledger...</div>
+            ) : transactions.length === 0 ? (
+              <div className="py-10 text-center text-slate-400">
+                <FileText className="w-8 h-8 mx-auto mb-2 text-slate-600" />
+                <p className="text-sm font-medium">{t('noTransactionsYet')}</p>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {transactions.map((tx) => (
+                  <div 
+                    key={tx.id}
+                    className="p-3.5 bg-slate-950/60 rounded-xl border border-slate-800/80 flex items-center justify-between text-xs"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs ${
+                        tx.type === 'commission_credit' || tx.type === 'withdrawal_refund' || tx.type === 'referral_bonus'
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          : 'bg-pink-500/10 text-pink-400 border border-pink-500/20'
+                      }`}>
+                        {tx.type === 'commission_credit' || tx.type === 'withdrawal_refund' ? (
+                          <ArrowDownRight className="w-4 h-4" />
+                        ) : (
+                          <ArrowUpRight className="w-4 h-4" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-white capitalize">
+                          {tx.description || tx.type.replace('_', ' ')}
+                        </div>
+                        <div className="text-[11px] text-slate-500 font-mono">
+                          {new Date(tx.createdAt).toLocaleString()} • Idemp: {tx.idempotencyKey.slice(0, 15)}...
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-sm font-extrabold ${
+                        tx.type === 'commission_credit' || tx.type === 'withdrawal_refund'
+                          ? 'text-emerald-400'
+                          : 'text-pink-400'
+                      }`}>
+                        {tx.type === 'commission_credit' || tx.type === 'withdrawal_refund' ? '+' : '-'}
+                        {formatBDT(tx.amount)}
+                      </div>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold">
+                        {tx.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 3: Monthly Statement */}
+        {activeTab === 'statement' && (
+          <div className="space-y-4">
+            <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800">
+              <h4 className="text-sm font-bold text-white mb-2">October 2026 Accounting Summary</h4>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <span className="text-slate-400 block">Gross Publisher Share</span>
+                  <span className="text-sm font-bold text-white">{formatBDT(lifetimeApproved)}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">Payouts Dispatched</span>
+                  <span className="text-sm font-bold text-pink-400">{formatBDT(paidCommission)}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">Reserved</span>
+                  <span className="text-sm font-bold text-amber-400">{formatBDT(reservedBalance)}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">Net Carryforward</span>
+                  <span className="text-sm font-bold text-emerald-400">{formatBDT(availableBalance)}</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              EarnBD utilizes an immutable ledger model where all financial balance modifications are strictly backed by atomic transactions. Unpaid balances rollover automatically each calendar month.
+            </p>
+          </div>
+        )}
+
+      </div>
+
+      <ReferralPanel />
+    </div>
+  );
+};
+}{(adImageClicks * 0.001).toFixed(3)}</div>
+          <p className="text-[11px] text-slate-500 mt-1">$0.001 per recorded ad-image click · demo display only</p>
+        </div>
+        <div className="w-11 h-11 rounded-xl bg-amber-500/10 text-amber-300 flex items-center justify-center">
+          <Wallet className="w-5 h-5" />
+        </div>
+      </div>
+
       {/* 2. STATS & EARNINGS METRICS GRID */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         
