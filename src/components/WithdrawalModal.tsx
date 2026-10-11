@@ -49,8 +49,8 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
       return;
     }
 
-    if (!isValidBdMobileNumber(walletNumber)) {
-      setErrorMessage(t('invalidPhone'));
+    if (walletType === 'Binance' ? !/^\d{6,20}$/.test(walletNumber.trim()) : !isValidBdMobileNumber(walletNumber)) {
+      setErrorMessage(walletType === 'Binance' ? 'Enter a valid Binance UID (6–20 digits).' : t('invalidPhone'));
       return;
     }
 
@@ -161,7 +161,7 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-2">
                   {t('selectMethod')}
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   
                   {/* bKash */}
                   <button
@@ -200,26 +200,31 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
                       <div className="text-[10px] text-slate-400">Personal Wallet</div>
                     </div>
                   </button>
+                  <button type="button" onClick={() => setWalletType('Binance')} className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${walletType === 'Binance' ? 'bg-yellow-950/40 border-yellow-400 text-white' : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'}`}>
+                    <div className="w-8 h-8 rounded-lg bg-[#f0b90b] flex items-center justify-center font-black text-slate-950 text-xs">BN</div>
+                    <div className="text-left"><div className="text-sm font-bold">Binance</div><div className="text-[10px] text-slate-400">Binance UID</div></div>
+                  </button>
                 </div>
               </div>
 
               {/* Wallet Number */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
-                  {t('walletNumber')}
+                  {walletType === 'Binance' ? 'Binance UID' : t('walletNumber')}
                 </label>
                 <div className="relative">
                   <input
-                    type="tel"
+                    type={walletType === 'Binance' ? 'text' : 'tel'}
+                    inputMode={walletType === 'Binance' ? 'numeric' : 'tel'}
                     value={walletNumber}
-                    onChange={(e) => setWalletNumber(e.target.value)}
-                    placeholder="017XXXXXXXX"
-                    maxLength={11}
+                    onChange={(e) => setWalletNumber(e.target.value.replace(walletType === 'Binance' ? /\D/g : /$^/, ''))}
+                    placeholder={walletType === 'Binance' ? 'Enter Binance UID' : '017XXXXXXXX'}
+                    maxLength={walletType === 'Binance' ? 20 : 11}
                     className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-white font-mono text-sm placeholder:text-slate-600 outline-none"
                     required
                   />
                   <div className="absolute right-3 top-2.5 text-xs text-slate-500 font-mono">
-                    BD 11-digit
+                    {walletType === 'Binance' ? '6–20 digits' : 'BD 11-digit'}
                   </div>
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1">
@@ -322,12 +327,12 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
               <div className="flex justify-between items-center text-sm border-b border-slate-800/80 pb-2">
                 <span className="text-slate-400">Payment Wallet</span>
                 <span className="font-bold text-white flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${walletType === 'bKash' ? 'bg-[#e2136e]' : 'bg-[#f7931e]'}`} />
+                  <span className={`w-2 h-2 rounded-full ${walletType === 'bKash' ? 'bg-[#e2136e]' : walletType === 'Nagad' ? 'bg-[#f7931e]' : 'bg-[#f0b90b]'}`} />
                   {walletType}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm border-b border-slate-800/80 pb-2">
-                <span className="text-slate-400">Target Mobile Number</span>
+                <span className="text-slate-400">{walletType === 'Binance' ? 'Binance UID' : 'Target Mobile Number'}</span>
                 <span className="font-mono font-bold text-emerald-400">{walletNumber}</span>
               </div>
               <div className="flex justify-between items-center text-sm border-b border-slate-800/80 pb-2">
@@ -347,7 +352,7 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
             <div className="text-xs text-slate-400 bg-slate-950/60 p-3 rounded-xl border border-slate-800/60 mb-5 flex items-start gap-2">
               <Clock className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
               <span>
-                Funds will be reserved from your available balance immediately upon submission. Admin manually transfers via {walletType} and provides TrxID.
+                Funds will be reserved from your available balance immediately upon submission. Admin manually transfers via {walletType} and records the transaction reference.
               </span>
             </div>
 
