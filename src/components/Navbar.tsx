@@ -70,7 +70,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
-              onClick={() => setCurrentTab('directory')}
+              onClick={() => {
+                setCurrentTab('home');
+                window.setTimeout(() => {
+                  document.getElementById('directory-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+              }}
               className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1.5 ${
                 currentTab === 'directory'
                   ? 'text-white bg-slate-800/80 border border-slate-700/60'
