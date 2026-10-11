@@ -465,3 +465,59 @@ export async function adminCreditBalance(
     });
   });
 }
+
+
+/** Admin-only correction: reduce available balance without touching reserved funds or historical earnings totals. */
+export async function adminDebitBalance(
+  userId: string,
+  amount: number,
+  note: string,
+  adminEmail: string
+): Promise<void> {
+  if (!userId) throw new Error('Select a valid user.');
+  if (!Number.isSafeInteger(amount) || amount <= 0) throw new Error('Enter a positive whole-number BDT amount.');
+  if (!adminEmail) throw new Error('Admin session is required.');
+  if (!note.trim()) throw new Error('Provide a reason for reducing the balance.');
+
+  const txId = `tx_admin_adjustment_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const auditId = `log_admin_adjustment_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const now = new Date().toISOString();
+
+  await runTransaction(db, async (tx) => {
+    const walletRef = doc(db, 'wallets', userId);
+    const walletSnap = await tx.get(walletRef);
+    if (!walletSnap.exists()) throw new Error('User wallet not found.');
+
+    const wallet = walletSnap.data() as UserWallet;
+    const currentAvailable = Number(wallet.availableBalance || 0);
+    if (amount > currentAvailable) {
+      throw new Error(`Cannot reduce by ৳${amount.toLocaleString()}; available balance is only ৳${currentAvailable.toLocaleString()}.`);
+    }
+
+    tx.update(walletRef, {
+      availableBalance: currentAvailable - amount,
+      updatedAt: now
+    });
+
+    tx.set(doc(db, 'walletTransactions', txId), {
+      id: txId,
+      userId,
+      type: 'adjustment',
+      amount,
+      status: 'completed',
+      description: `Admin balance reduction: ${note.trim()}`,
+      referenceId: auditId,
+      idempotencyKey: txId,
+      createdAt: now
+    });
+
+    tx.set(doc(db, 'auditLogs', auditId), {
+      id: auditId,
+      actorId: 'admin',
+      actorEmail: adminEmail,
+      action: 'ADMIN_BALANCE_REDUCED',
+      details: `Reduced available balance by ৳${amount} for user ${userId}. Reason: ${note.trim()}. Previous available balance: ৳${currentAvailable}; new available balance: ৳${currentAvailable - amount}.`,
+      timestamp: now
+    });
+  });
+}
