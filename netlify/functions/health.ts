@@ -9,7 +9,7 @@ export async function handler() {
       status: 'ok',
       service: 'EarnBD Netlify Serverless API',
       currency: 'BDT',
-      minWithdrawalAmount: 5000,
+      minWithdrawalAmount: 3000,
       timestamp: new Date().toISOString()
     })
   };
