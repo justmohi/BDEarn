@@ -10,7 +10,8 @@ import {
   Compass,
   FileText,
   Lock,
-  ChevronRight
+  ChevronRight,
+  Gift
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { AdCard, AdCategory } from '../types';
@@ -362,10 +363,10 @@ export const HomePage: React.FC<HomePageProps> = ({
               3
             </div>
             <h3 className="text-base font-bold text-white mb-2">
-              ৳5,000 bKash / Nagad Payout
+              ৳3,000 bKash / Nagad Payout
             </h3>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Once approved available earnings reach ৳5,000 BDT, request manual disbursement. Admin securely sends funds and logs the TrxID.
+              Once approved available earnings reach ৳3,000 BDT, request manual disbursement. Admin securely sends funds and logs the TrxID.
             </p>
           </div>
 
