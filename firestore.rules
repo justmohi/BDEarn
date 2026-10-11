@@ -167,8 +167,8 @@ service cloud.firestore {
     function isValidWithdrawalRequest(data) {
       return data.id is string && data.id.size() <= 128 &&
              data.userId is string && data.userId.size() <= 128 &&
-             data.walletType in ['bKash', 'Nagad'] &&
-             data.walletNumber is string && data.walletNumber.size() >= 11 && data.walletNumber.size() <= 20 &&
+             data.walletType in ['bKash', 'Nagad', 'Binance'] &&
+             data.walletNumber is string && data.walletNumber.size() >= 6 && data.walletNumber.size() <= 20 &&
              data.amount is number && data.amount >= 3000 &&
              data.status in ['pending', 'processing', 'approved', 'paid', 'rejected'];
     }
