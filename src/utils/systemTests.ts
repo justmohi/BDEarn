@@ -13,19 +13,19 @@ export interface TestResult {
 export async function runAllSystemTests(): Promise<TestResult[]> {
   const results: TestResult[] = [];
 
-  // Test 1: Minimum Withdrawal Eligibility (৳5,000)
+  // Test 1: Minimum Withdrawal Eligibility (৳3,000)
   const t1Start = performance.now();
   let t1Passed = false;
   let t1Msg = '';
   try {
-    const lowBalance = 4500;
-    const reqAmount = 5000;
+    const lowBalance = 2500;
+    const reqAmount = 3000;
     const eligible1 = lowBalance >= MIN_WITHDRAWAL_BDT && reqAmount <= lowBalance;
-    const belowMinReq = 3500 >= MIN_WITHDRAWAL_BDT;
+    const belowMinReq = 2500 >= MIN_WITHDRAWAL_BDT;
     
     if (!eligible1 && !belowMinReq) {
       t1Passed = true;
-      t1Msg = `Rule verified: Sub-৳5,000 balance (${lowBalance} BDT) & sub-threshold amount (3,500 BDT) are strictly rejected.`;
+      t1Msg = `Rule verified: Sub-৳3,000 balance (${lowBalance} BDT) & sub-threshold amount (2,500 BDT) are strictly rejected.`;
     } else {
       t1Msg = 'Failed: Low balance was not blocked.';
     }
@@ -34,8 +34,8 @@ export async function runAllSystemTests(): Promise<TestResult[]> {
   }
   results.push({
     id: 'test_min_withdrawal',
-    name: 'Minimum Withdrawal Threshold (৳5,000)',
-    description: 'Enforces that only approved balances >= ৳5,000 can initiate a payout request.',
+    name: 'Minimum Withdrawal Threshold (৳3,000)',
+    description: 'Enforces that only approved balances >= ৳3,000 can initiate a payout request.',
     passed: t1Passed,
     message: t1Msg,
     durationMs: Math.round(performance.now() - t1Start)
@@ -47,15 +47,15 @@ export async function runAllSystemTests(): Promise<TestResult[]> {
   let t2Msg = '';
   try {
     let mockWallet = { available: 12000, reserved: 0 };
-    const withdrawAmount = 5000;
+    const withdrawAmount = 3000;
     
     // Simulate atomic reservation
     mockWallet.available -= withdrawAmount;
     mockWallet.reserved += withdrawAmount;
 
-    if (mockWallet.available === 7000 && mockWallet.reserved === 5000) {
+    if (mockWallet.available === 9000 && mockWallet.reserved === 3000) {
       t2Passed = true;
-      t2Msg = `Atomic reservation verified: Available deducted by ৳5,000 (now ৳7,000), Reserved credited by ৳5,000.`;
+      t2Msg = `Atomic reservation verified: Available deducted by ৳3,000 (now ৳9,000), Reserved credited by ৳3,000.`;
     } else {
       t2Msg = 'Failed: Wallet balances did not update correctly.';
     }
@@ -76,8 +76,8 @@ export async function runAllSystemTests(): Promise<TestResult[]> {
   let t3Passed = false;
   let t3Msg = '';
   try {
-    let mockWallet = { available: 7000, reserved: 5000 };
-    const rejectedAmount = 5000;
+    let mockWallet = { available: 9000, reserved: 3000 };
+    const rejectedAmount = 3000;
     
     // Simulate admin rejection refund
     mockWallet.reserved -= rejectedAmount;
@@ -85,7 +85,7 @@ export async function runAllSystemTests(): Promise<TestResult[]> {
 
     if (mockWallet.available === 12000 && mockWallet.reserved === 0) {
       t3Passed = true;
-      t3Msg = `Refund confirmed: Reserved ৳5,000 returned to Available balance (restored to ৳12,000).`;
+      t3Msg = `Refund confirmed: Reserved ৳3,000 returned to Available balance (restored to ৳12,000).`;
     } else {
       t3Msg = 'Failed: Balance was not refunded.';
     }
@@ -166,16 +166,16 @@ export async function runAllSystemTests(): Promise<TestResult[]> {
     const cycle = '2026-10';
     const userId = 'usr_test_99';
     const key = `comm_${cycle}_${userId}`;
-    const initialAvailable = 3000;
-    const initialApproved = 3000;
-    const monthlyShare = 2500;
+    const initialAvailable = 1500;
+    const initialApproved = 1500;
+    const monthlyShare = 1500;
     
     // Simulate carry-forward addition
-    const carriedOverTotal = initialAvailable + monthlyShare; // 5500 >= 5000 (now eligible!)
+    const carriedOverTotal = initialAvailable + monthlyShare; // 3000 reaches the minimum threshold
     
-    if (key === 'comm_2026-10_usr_test_99' && carriedOverTotal === 5500 && carriedOverTotal >= MIN_WITHDRAWAL_BDT) {
+    if (key === 'comm_2026-10_usr_test_99' && carriedOverTotal === 3000 && carriedOverTotal >= MIN_WITHDRAWAL_BDT) {
       t6Passed = true;
-      t6Msg = `Verified: Sub-threshold carry-forward (৳3,000) rolled with monthly share (৳2,500) qualifies for ৳5,000 threshold (Total ৳5,500).`;
+      t6Msg = `Verified: Carry-forward (৳1,500) plus monthly share (৳1,500) reaches the ৳3,000 threshold.`;
     } else {
       t6Msg = 'Failed carry-forward simulation.';
     }
@@ -185,7 +185,7 @@ export async function runAllSystemTests(): Promise<TestResult[]> {
   results.push({
     id: 'test_commission_carryover',
     name: 'Commission Idempotency & Carryover Rollover',
-    description: 'Validates that monthly shares rollover with previous balances to meet the ৳5,000 threshold.',
+    description: 'Validates that monthly shares rollover with previous balances to meet the ৳3,000 threshold.',
     passed: t6Passed,
     message: t6Msg,
     durationMs: Math.round(performance.now() - t6Start)
