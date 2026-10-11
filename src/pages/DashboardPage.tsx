@@ -131,7 +131,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
   const isEligibleForWithdrawal = availableBalance >= MIN_WITHDRAWAL_BDT;
   const progressPercent = Math.min(100, Math.round((availableBalance / MIN_WITHDRAWAL_BDT) * 100));
-  const remainingNeeded = Math.max(0, MIN_WITHDRAWAL_BDT - availableBalance);
 
   return (
     <div className="space-y-8">
@@ -187,16 +186,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               <ShieldCheck className="w-4 h-4" />
               <span>{t('withdrawalGoalTitle')} ({formatBDT(MIN_WITHDRAWAL_BDT)})</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white">
-              {isEligibleForWithdrawal ? (
-                <span className="text-emerald-400">{t('eligibleToWithdraw')}</span>
-              ) : (
-                <span>{t('needMoreToWithdraw', { remaining: remainingNeeded.toLocaleString() })}</span>
-              )}
-            </h3>
-            <p className="text-xs text-slate-300 mt-1 max-w-xl">
+            <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-xl leading-relaxed">
               {t('minWithdrawalNotice')}
             </p>
+            {isEligibleForWithdrawal && (
+              <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                {t('eligibleToWithdraw')}
+              </span>
+            )}
           </div>
 
           <div className="text-right shrink-0">
