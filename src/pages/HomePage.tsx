@@ -89,7 +89,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-300">
               <ShieldCheck className="h-4 w-4" />
-              <span>Official Bangladesh Earning Directory</span>
+              <span>Official Bangladesh Earning Platform</span>
             </div>
           </div>
 
@@ -102,7 +102,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               }}
               className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-xl shadow-emerald-500/25 flex items-center gap-2 transition active:scale-95"
             >
-              <span>{t('startBrowsing')}</span>
+              <span>View Ad</span>
               <ChevronRight className="w-4 h-4" />
             </button>
 
