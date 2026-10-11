@@ -24,8 +24,9 @@ function getAdminServices() {
     projectId: serviceAccount.project_id
   }, 'earnbd-referrals');
   // Keep server-side reads/writes on the same named Firestore database as the client app.
-  const databaseId = process.env.FIRESTORE_DATABASE_ID || 'ai-studio-earnbdbangladesh-49ddc5c8-992d-440b-8394-311184dab3b1';
-  const db = getFirestore(app, databaseId);
+  const databaseId = process.env.FIRESTORE_DATABASE_ID;
+  // If no database ID is configured, use the project's default Firestore database.
+  const db = databaseId ? getFirestore(app, databaseId) : getFirestore(app);
   return { adminAuth: getAuth(app), db };
 }
 
