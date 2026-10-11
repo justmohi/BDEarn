@@ -139,7 +139,7 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
           ) : (
             <div className="flex items-center gap-2 px-3.5 py-2 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs font-semibold">
               <AlertCircle className="w-4 h-4 text-amber-400" />
-              <span>Need ৳{(MIN_WITHDRAWAL_BDT - availableBalance).toLocaleString()} more</span>
+              <span>Minimum withdrawal: {formatBDT(MIN_WITHDRAWAL_BDT)}</span>
             </div>
           )}
         </div>
