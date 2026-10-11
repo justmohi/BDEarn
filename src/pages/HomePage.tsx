@@ -232,51 +232,10 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* Website AdSense placement; enabled only after AdSense IDs are configured. */}
       <WebsiteAdSlot />
 
-      {/* 3. DIRECTORY & IMAGE CARDS GRID */}
+      {/* 3. VIEW AD SECTION */}
       <section id="directory-section" className="space-y-6">
-        
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1">
-              Verified Advertising Directory
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-              {t('directoryTitle')}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              {t('directorySubtitle')}
-            </p>
-          </div>
-
-          {/* Search Bar */}
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t('searchPlaceholder')}
-              className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-xl pl-9 pr-3.5 py-2 text-sm text-white placeholder:text-slate-500 outline-none"
-            />
-          </div>
-        </div>
-
-        {/* Category Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                selectedCategory === cat
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                  : 'bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700'
-              }`}
-            >
-              {cat === 'All' ? t('allCategories') : cat}
-            </button>
-          ))}
+        <div className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1">
+          View Ad
         </div>
 
         {/* Cards Grid */}
