@@ -5,9 +5,9 @@ EarnBD is a modern, mobile-first digital advertising directory and transparent p
 ## 🎯 Key Features & Rules
 
 1. **BDT (৳) Currency Standard**: All monetary metrics and transaction ledgers are strictly denominated in Bangladeshi Taka (BDT).
-2. **Minimum Withdrawal Rule (৳5,000 Threshold)**:
-   - Available balance must be at least **BDT 5,000** to initiate a payout request.
-   - Sub-৳5,000 balances cannot submit requests.
+2. **Minimum Withdrawal Rule (৳3,000 Threshold)**:
+   - Available balance must be at least **BDT 3,000** to initiate a payout request.
+   - Sub-৳3,000 balances cannot submit requests.
    - Unpaid approved balances roll over seamlessly into subsequent calendar months.
 3. **bKash & Nagad Manual Disbursements**:
    - Users select their preferred mobile wallet and enter an 11-digit Bangladeshi mobile number (`013` - `019`).
@@ -67,7 +67,7 @@ The application uses `firebase-applet-config.json` generated during Firebase pro
 - A valid new account receives a **BDT 100 pending referral record** for the referrer; it is not immediately withdrawable.
 - The eligibility period is **30 complete days** from account registration.
 - After 30 days, an administrator can approve the bonus only if both accounts are active and the referred user's Firebase email is verified.
-- Approval credits the referrer's wallet once using a deterministic ledger ID. The existing **BDT 5,000 minimum withdrawal** still applies.
+- Approval credits the referrer's wallet once using a deterministic ledger ID. The existing **BDT 3,000 minimum withdrawal** still applies.
 - Self-referrals, duplicate referral claims, client-side bonus changes, and premature approvals are rejected.
 - User referral history is read-only from the client. Claims, approvals, and wallet credits are handled by `netlify/functions/referral.ts`.
 
