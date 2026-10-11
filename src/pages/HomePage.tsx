@@ -80,32 +80,21 @@ export const HomePage: React.FC<HomePageProps> = ({
   return (
     <div className="space-y-12">
       
-      {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden pt-8 pb-12 sm:pt-14 sm:pb-16 bg-gradient-to-b from-[#0d142b] via-[#090d1a] to-[#090d1a] rounded-3xl border border-slate-800/80 shadow-2xl">
-        {/* Subtle background glow */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* 1. COMPACT HERO SECTION */}
+      <section className="relative isolate overflow-hidden rounded-3xl border border-slate-800/80 bg-gradient-to-br from-[#0d142b] via-[#090d1a] to-[#071b20] px-4 py-6 sm:px-7 sm:py-8 shadow-xl">
+        <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -left-12 h-56 w-56 rounded-full bg-cyan-500/10 blur-3xl" />
 
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center space-y-6">
-          
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider shadow-sm">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Official Bangladesh Earning Directory</span>
+        <div className="relative mx-auto max-w-5xl space-y-5">
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-300">
+              <ShieldCheck className="h-4 w-4" />
+              <span>Official Bangladesh Earning Directory</span>
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-            Transparent Publisher <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-              Revenue Sharing in BDT (৳)
-            </span>
-          </h1>
-
-          <p className="text-slate-300 text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            {t('heroSubtitle')}
-          </p>
-
           {/* Action CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={() => {
                 const el = document.getElementById('directory-section');
@@ -130,8 +119,8 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
 
           {/* Value Props Pills */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 max-w-3xl mx-auto text-left">
-            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 max-w-4xl mx-auto text-left">
+            <div className="bg-slate-900/70 border border-slate-800/90 p-3 sm:p-4 rounded-2xl transition-colors hover:border-slate-700">
               <div className="text-[11px] text-slate-400 font-medium">Min Threshold</div>
               <div className="text-base sm:text-lg font-black text-white">৳3,000 BDT</div>
             </div>
