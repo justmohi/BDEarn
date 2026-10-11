@@ -40,11 +40,12 @@ export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): P
     throw new Error(`Enter a whole-number withdrawal amount of at least BDT ৳${MIN_WITHDRAWAL_BDT}.`);
   }
 
-  if (walletType !== 'bKash' && walletType !== 'Nagad') {
-    throw new Error('Choose a valid payout method: bKash or Nagad.');
-  }
-
-  if (!userId || !isValidBdMobileNumber(walletNumber)) {
+  if (!['bKash', 'Nagad', 'Binance'].includes(walletType)) throw new Error('Choose a valid payout method.');
+  const destination = walletNumber.trim();
+  if (!userId) throw new Error('Please sign in before requesting a payout.');
+  if (walletType === 'Binance') {
+    if (!/^\d{6,20}$/.test(destination)) throw new Error('Enter a valid Binance UID (6–20 digits).');
+  } else if (!isValidBdMobileNumber(destination)) {
     throw new Error('Please enter a valid 11-digit Bangladeshi mobile number (013-019).');
   }
 
@@ -107,7 +108,7 @@ export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): P
         userId,
         userEmail,
         walletType,
-        walletNumber,
+        walletNumber: destination,
         amount,
         status: 'pending',
         requestedAt: new Date().toISOString()
@@ -122,7 +123,7 @@ export async function submitWithdrawalRequest(params: SubmitWithdrawalParams): P
         type: 'withdrawal_reserve',
         amount,
         status: 'completed',
-        description: `Reserved for ${walletType} payout to ${walletNumber}`,
+        description: `Reserved for ${walletType} payout to ${destination}`,
         referenceId: requestId,
         idempotencyKey,
         createdAt: new Date().toISOString()
@@ -206,7 +207,7 @@ export async function completeWithdrawalPayout(
         type: 'withdrawal_payout',
         amount: reqData.amount,
         status: 'completed',
-        description: `Manual ${reqData.walletType} payout completed (TrxID: ${transactionRef})`,
+        description: `Manual ${reqData.walletType} payout completed (Reference: ${transactionRef})`,
         referenceId: requestId,
         idempotencyKey,
         createdAt: new Date().toISOString()
@@ -220,7 +221,7 @@ export async function completeWithdrawalPayout(
         actorId: 'admin',
         actorEmail: adminEmail,
         action: 'PAYOUT_COMPLETED',
-        details: `Completed payout of ৳${reqData.amount} via ${reqData.walletType} to ${reqData.walletNumber}. TrxID: ${transactionRef}`,
+        details: `Completed payout of ৳${reqData.amount} via ${reqData.walletType} to ${reqData.walletNumber}. Reference: ${transactionRef}`,
         timestamp: new Date().toISOString()
       });
     });
