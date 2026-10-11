@@ -41,7 +41,7 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
         </div>
         <h2 className="text-2xl font-bold text-white mb-2">{t('withdrawTitle')}</h2>
         <p className="text-sm text-slate-300 mb-6">
-          Sign in to your EarnBD publisher account to request bKash or Nagad payouts.
+          Sign in to your EarnBD publisher account to request bKash, Nagad, or Binance payouts.
         </p>
         <button
           onClick={onOpenAuth}
@@ -64,8 +64,8 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
       setErrorMessage(t('insufficientBalance'));
       return;
     }
-    if (!isValidBdMobileNumber(walletNumber)) {
-      setErrorMessage(t('invalidPhone'));
+    if (walletType === 'Binance' ? !/^\d{6,20}$/.test(walletNumber.trim()) : !isValidBdMobileNumber(walletNumber)) {
+      setErrorMessage(walletType === 'Binance' ? 'Enter a valid Binance UID (6–20 digits).' : t('invalidPhone'));
       return;
     }
     if (amount < MIN_WITHDRAWAL_BDT || amount > availableBalance) {
@@ -163,7 +163,7 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
               <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-2.5">
                 {t('selectMethod')}
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 
                 <div 
                   onClick={() => setWalletType('bKash')}
@@ -205,15 +205,16 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
             {/* Mobile Number */}
             <div>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
-                {t('walletNumber')}
+                {walletType === 'Binance' ? 'Binance UID' : t('walletNumber')}
               </label>
               <div className="relative">
                 <input
-                  type="tel"
+                  type={walletType === 'Binance' ? 'text' : 'tel'}
+                  inputMode={walletType === 'Binance' ? 'numeric' : 'tel'}
                   value={walletNumber}
-                  onChange={(e) => setWalletNumber(e.target.value)}
-                  placeholder="017XXXXXXXX"
-                  maxLength={11}
+                  onChange={(e) => setWalletNumber(e.target.value.replace(walletType === 'Binance' ? /\D/g : /$^/, ''))}
+                  placeholder={walletType === 'Binance' ? 'Enter Binance UID' : '017XXXXXXXX'}
+                  maxLength={walletType === 'Binance' ? 20 : 11}
                   className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-xl px-4 py-3 text-white font-mono text-base placeholder:text-slate-600 outline-none"
                   required
                 />
@@ -222,7 +223,7 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-1">
-                {t('walletNumberHelp')}
+                {walletType === 'Binance' ? 'Enter the numeric UID shown in your Binance profile. Never share your password, OTP, or API key.' : t('walletNumberHelp')}
               </p>
             </div>
 
@@ -310,12 +311,12 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
               <div className="flex justify-between text-sm pb-2 border-b border-slate-800">
                 <span className="text-slate-400">Mobile Wallet Provider</span>
                 <span className="font-bold text-white flex items-center gap-2">
-                  <span className={`w-2.5 h-2.5 rounded-full ${walletType === 'bKash' ? 'bg-[#e2136e]' : 'bg-[#f7931e]'}`} />
+                  <span className={`w-2.5 h-2.5 rounded-full ${walletType === 'bKash' ? 'bg-[#e2136e]' : walletType === 'Nagad' ? 'bg-[#f7931e]' : 'bg-[#f0b90b]'}`} />
                   {walletType}
                 </span>
               </div>
               <div className="flex justify-between text-sm pb-2 border-b border-slate-800">
-                <span className="text-slate-400">Personal Mobile Number</span>
+                <span className="text-slate-400">{walletType === 'Binance' ? 'Binance UID' : 'Personal Mobile Number'}</span>
                 <span className="font-mono font-bold text-emerald-400 text-base">{walletNumber}</span>
               </div>
               <div className="flex justify-between text-sm pb-2 border-b border-slate-800">
