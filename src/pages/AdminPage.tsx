@@ -47,7 +47,8 @@ import {
   completeWithdrawalPayout, 
   rejectWithdrawalPayout, 
   creditCommissionToUser,
-  adminCreditBalance
+  adminCreditBalance,
+  adminDebitBalance
 } from '../services/walletService';
 import { 
   fetchAllAdCards, 
@@ -192,6 +193,43 @@ export const AdminPage: React.FC = () => {
       alert(`Successfully added ৳${amount.toLocaleString()} to the user's available balance.`);
     } catch (err: any) {
       setActionError(err.message || 'Could not add balance. Check Firestore rules deployment.');
+    } finally {
+      setIsProcessingAction(false);
+    }
+  };
+
+  const handleAdminBalanceReduction = async (userId: string, userEmail: string) => {
+    if (!currentUser?.email) {
+      setActionError('Admin session is required.');
+      return;
+    }
+    const amount = Number(creditAmounts[userId] || 0);
+    const note = (creditNotes[userId] || '').trim();
+    if (!Number.isSafeInteger(amount) || amount <= 0) {
+      setActionError('Enter a positive whole-number BDT amount to reduce.');
+      return;
+    }
+    if (!note) {
+      setActionError('A reason is required when reducing a user balance.');
+      return;
+    }
+    const currentBalance = walletBalances[userId] || 0;
+    if (amount > currentBalance) {
+      setActionError(`Cannot reduce ৳${amount.toLocaleString()}; ${userEmail} has only ৳${currentBalance.toLocaleString()} available.`);
+      return;
+    }
+    if (!confirm(`Reduce ${userEmail}'s available balance by ৳${amount.toLocaleString()}? This cannot be automatically undone.`)) return;
+
+    setIsProcessingAction(true);
+    setActionError('');
+    try {
+      await adminDebitBalance(userId, amount, note, currentUser.email);
+      setCreditAmounts(previous => ({ ...previous, [userId]: '' }));
+      setCreditNotes(previous => ({ ...previous, [userId]: '' }));
+      await loadAllAdminData();
+      alert(`Reduced ৳${amount.toLocaleString()} from the user's available balance. The adjustment was recorded in the audit log.`);
+    } catch (err: any) {
+      setActionError(err.message || 'Could not reduce balance. Check Firestore rules deployment.');
     } finally {
       setIsProcessingAction(false);
     }
@@ -862,7 +900,7 @@ export const AdminPage: React.FC = () => {
             Registered Publishers, Click Counts & Wallet Management
           </h3>
           <p className="text-xs text-slate-400 mb-4">
-            Click counts are recorded ad-card/image clicks, not verified ad-network impressions. Use Add Balance to credit a user's withdrawable wallet; minimum withdrawal is ৳3,000.
+            Click counts are recorded ad-card/image clicks, not verified ad-network impressions. Use Add Balance to credit a user's wallet, or Reduce Balance to correct an accidental over-credit. Reductions require a reason and cannot touch reserved withdrawal funds. Minimum withdrawal is ৳3,000.
           </p>
           {actionError && <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300">{actionError}</div>}
           <div className="overflow-x-auto">
@@ -924,6 +962,11 @@ export const AdminPage: React.FC = () => {
                           onClick={() => handleAdminBalanceCredit(u.uid)}
                           className="rounded-lg bg-emerald-600 px-3 py-2 text-[11px] font-bold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40 whitespace-nowrap"
                         >Add Balance</button>}
+                        {u.role !== 'admin' && <button
+                          disabled={isProcessingAction || !creditAmounts[u.uid] || !(creditNotes[u.uid] || '').trim()}
+                          onClick={() => handleAdminBalanceReduction(u.uid, u.email)}
+                          className="rounded-lg bg-red-700 px-3 py-2 text-[11px] font-bold text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-40 whitespace-nowrap"
+                        >Reduce Balance</button>}
                         {u.role !== 'admin' && <button
                           onClick={async () => {
                             const newStatus = u.status === 'active' ? 'suspended' : 'active';
