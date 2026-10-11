@@ -182,6 +182,34 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
+      {/* Manual sponsored-task reward notice */}
+      <section className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/80 via-slate-900 to-teal-950/70 p-5 sm:p-6 shadow-lg">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3.5">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-500/15 text-emerald-300">
+              <Gift className="h-6 w-6" />
+            </div>
+            <div>
+              <div className="mb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-300">EarnBD Sponsored Task Reward</div>
+              <h3 className="text-lg sm:text-xl font-extrabold text-white">১০০টি বিজ্ঞাপন দেখুন, ৳৫০ রিওয়ার্ড পান</h3>
+              <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-300">
+                ১০০টি আলাদা EarnBD স্পনসরড বিজ্ঞাপন/টাস্ক সম্পন্ন করার পর যাচাইয়ের জন্য অপেক্ষা করুন। যাচাই করে অ্যাডমিন অনুমোদন দিলে আপনার অ্যাকাউন্টে ৳৫০ ব্যালেন্স যোগ করা হবে। একই টাস্ক বারবার গণনা করা হবে না।
+              </p>
+              <p className="mt-2 text-xs font-medium text-emerald-200/80">Reward is added manually by the EarnBD admin after verification.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              if (!currentUser) onOpenAuth();
+              else onNavigateTab('dashboard');
+            }}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400 active:scale-[0.98]"
+          >
+            View Account <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </section>
+
       {/* 2. STRICT AD POLICY COMPLIANCE BANNER */}
       <section className="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-4 sm:p-5 shadow-lg relative overflow-hidden">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
