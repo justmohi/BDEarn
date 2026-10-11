@@ -164,58 +164,74 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
                 {t('selectMethod')}
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                
-                <div 
+                <button
+                  type="button"
                   onClick={() => setWalletType('bKash')}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-center gap-3.5 ${
+                  aria-pressed={walletType === 'bKash'}
+                  className={`p-4 rounded-2xl border text-left transition-all flex items-center gap-3.5 ${
                     walletType === 'bKash'
                       ? 'bg-pink-950/40 border-pink-500 shadow-lg shadow-pink-950/30'
                       : 'bg-slate-950 border-slate-800 hover:border-slate-700'
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#e2136e] flex items-center justify-center font-black text-white text-sm">
-                    bK
+                  <div className="w-12 h-12 rounded-xl bg-[#d12053] flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 64 64" role="img" aria-label="bKash logo" className="w-9 h-9">
+                      <path d="M13 8 43 13 28 32 49 53 36 56 8 28 26 28Z" fill="#fff"/>
+                      <path d="M34 8 56 28 40 45 34 38 44 28 30 15Z" fill="#fff"/>
+                    </svg>
                   </div>
                   <div>
                     <div className="text-sm font-bold text-white">bKash Payout</div>
                     <div className="text-xs text-slate-400">Personal Account (0% Fee)</div>
                   </div>
-                </div>
+                </button>
 
-                <div 
+                <button
+                  type="button"
                   onClick={() => setWalletType('Nagad')}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-center gap-3.5 ${
+                  aria-pressed={walletType === 'Nagad'}
+                  className={`p-4 rounded-2xl border text-left transition-all flex items-center gap-3.5 ${
                     walletType === 'Nagad'
                       ? 'bg-orange-950/40 border-orange-500 shadow-lg shadow-orange-950/30'
                       : 'bg-slate-950 border-slate-800 hover:border-slate-700'
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#f7931e] flex items-center justify-center font-black text-white text-sm">
-                    নগদ
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 64 64" role="img" aria-label="Nagad logo" className="w-10 h-10">
+                      <circle cx="32" cy="32" r="25" fill="none" stroke="#fff" strokeWidth="7" strokeDasharray="120 38" transform="rotate(-38 32 32)"/>
+                      <path d="M20 40 29 20 38 39 44 28" fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                   </div>
                   <div>
                     <div className="text-sm font-bold text-white">Nagad Payout</div>
                     <div className="text-xs text-slate-400">Personal Account (0% Fee)</div>
                   </div>
-                </div>
+                </button>
 
-                <div
+                <button
+                  type="button"
                   onClick={() => setWalletType('Binance')}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-center gap-3.5 ${
+                  aria-pressed={walletType === 'Binance'}
+                  className={`p-4 rounded-2xl border text-left transition-all flex items-center gap-3.5 ${
                     walletType === 'Binance'
                       ? 'bg-yellow-950/40 border-yellow-400 shadow-lg shadow-yellow-950/30'
                       : 'bg-slate-950 border-slate-800 hover:border-slate-700'
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#f0b90b] flex items-center justify-center font-black text-slate-950 text-sm">
-                    B
+                  <div className="w-12 h-12 rounded-xl bg-black border border-slate-800 flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 64 64" role="img" aria-label="Binance logo" className="w-10 h-10" fill="#F0B90B">
+                      <path d="M32 4 45 17 36 26 32 22 28 26 19 17Z"/>
+                      <path d="M17 19 26 28 22 32 26 36 17 45 4 32Z"/>
+                      <path d="M47 19 60 32 47 45 38 36 42 32 38 28Z"/>
+                      <path d="M32 42 36 38 45 47 32 60 19 47 28 38Z"/>
+                      <path d="M32 27 37 32 32 37 27 32Z"/>
+                    </svg>
                   </div>
                   <div>
                     <div className="text-sm font-bold text-white">Binance Payout</div>
                     <div className="text-xs text-slate-400">Binance UID (Manual)</div>
                   </div>
-                </div>
-
+                </button>
               </div>
             </div>
 
