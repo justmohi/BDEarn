@@ -132,7 +132,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 max-w-3xl mx-auto text-left">
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
               <div className="text-[11px] text-slate-400 font-medium">Min Threshold</div>
-              <div className="text-base sm:text-lg font-black text-white">৳5,000 BDT</div>
+              <div className="text-base sm:text-lg font-black text-white">৳3,000 BDT</div>
             </div>
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
               <div className="text-[11px] text-slate-400 font-medium">Payment Wallets</div>
@@ -148,6 +148,37 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
           </div>
 
+        </div>
+      </section>
+
+      {/* Official Telegram Channel */}
+      <section className="relative overflow-hidden rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-950/80 via-slate-900 to-blue-950/70 p-5 sm:p-6 shadow-lg">
+        <div className="absolute -right-8 -top-10 h-36 w-36 rounded-full bg-sky-500/10 blur-2xl pointer-events-none" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3.5">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-sky-400/30 bg-sky-500/15 text-sky-300">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6" aria-hidden="true">
+                <path d="M21.7 4.4 18.5 20c-.2 1.1-.8 1.4-1.7.9l-4.8-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.4-4.9 8.9-8c.4-.4-.1-.6-.6-.2L6.4 14l-4.7-1.5c-1-.3-1-1 .2-1.5L20 3.9c.8-.3 1.9.2 1.7.5Z" />
+              </svg>
+            </div>
+            <div>
+              <div className="mb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-sky-300">Official Telegram Channel</div>
+              <h3 className="text-lg sm:text-xl font-extrabold text-white">Join EarnBD on Telegram</h3>
+              <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-300">
+                Follow our official channel for announcements, platform updates, and important notices.
+              </p>
+              <p className="mt-2 text-xs font-medium text-sky-200/80">@EarnBDviewad</p>
+            </div>
+          </div>
+          <a
+            href="https://t.me/EarnBDviewad"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-sky-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-400 active:scale-[0.98]"
+          >
+            Join Official Channel
+            <ArrowRight className="h-4 w-4" />
+          </a>
         </div>
       </section>
 
