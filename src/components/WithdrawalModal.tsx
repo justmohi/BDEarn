@@ -131,7 +131,7 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
               </div>
               <div className="text-right">
                 <span className="text-[11px] text-slate-400 block font-medium">Requirement</span>
-                <span className="text-xs font-bold text-slate-300">Min ৳5,000 BDT</span>
+                <span className="text-xs font-bold text-slate-300">Min ৳3,000 BDT</span>
               </div>
             </div>
 
@@ -258,7 +258,7 @@ export const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
 
                 {/* Fast Presets */}
                 <div className="flex gap-2 mt-2">
-                  {[3000, 5000, 10000, 15000].map((preset) => (
+                  {[3000, 6000, 10000, 15000].map((preset) => (
                     <button
                       key={preset}
                       type="button"
