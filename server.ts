@@ -18,7 +18,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
     status: 'ok',
     service: 'EarnBD Backend API',
     currency: 'BDT',
-    minWithdrawalAmount: 5000,
+    minWithdrawalAmount: 3000,
     timestamp: new Date().toISOString()
   });
 });
@@ -37,8 +37,8 @@ app.post('/api/validate-withdrawal', (req: Request, res: Response) => {
   }
 
   const numAmount = Number(amount);
-  if (isNaN(numAmount) || numAmount < 5000) {
-    return res.status(400).json({ error: 'Minimum withdrawal amount is BDT 5,000.' });
+  if (isNaN(numAmount) || numAmount < 3000) {
+    return res.status(400).json({ error: 'Minimum withdrawal amount is BDT 3,000.' });
   }
 
   if (typeof availableBalance === 'number' && numAmount > availableBalance) {
