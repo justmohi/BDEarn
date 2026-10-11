@@ -567,7 +567,7 @@ export const AdminPage: React.FC = () => {
                   <th className="p-3">Req ID / Date</th>
                   <th className="p-3">User Email</th>
                   <th className="p-3">Wallet</th>
-                  <th className="p-3">Phone Number</th>
+                  <th className="p-3">Payout Destination</th>
                   <th className="p-3">Amount</th>
                   <th className="p-3">Status</th>
                   <th className="p-3">TrxID / Reason</th>
@@ -592,7 +592,7 @@ export const AdminPage: React.FC = () => {
                       </td>
                       <td className="p-3 text-slate-300">{w.userEmail}</td>
                       <td className="p-3 font-bold text-white flex items-center gap-1.5 mt-2">
-                        <span className={`w-2 h-2 rounded-full ${w.walletType === 'bKash' ? 'bg-[#e2136e]' : 'bg-[#f7931e]'}`} />
+                        <span className={`w-2 h-2 rounded-full ${w.walletType === 'bKash' ? 'bg-[#e2136e]' : w.walletType === 'Nagad' ? 'bg-[#f7931e]' : 'bg-[#f0b90b]'}`} />
                         {w.walletType}
                       </td>
                       <td className="p-3 font-mono text-emerald-400 font-semibold">{w.walletNumber}</td>
@@ -1041,7 +1041,7 @@ export const AdminPage: React.FC = () => {
 
             <div className="p-3 bg-slate-900 rounded-xl text-xs space-y-1 text-slate-300">
               <div>Amount: <strong className="text-white">{formatBDT(selectedWithdrawal.amount)}</strong></div>
-              <div>Wallet: <strong className="text-white">{selectedWithdrawal.walletType}</strong> ({selectedWithdrawal.walletNumber})</div>
+              <div>Destination: <strong className="text-white">{selectedWithdrawal.walletType}</strong> ({selectedWithdrawal.walletType === 'Binance' ? 'UID' : 'mobile'}: {selectedWithdrawal.walletNumber})</div>
               <div>User: {selectedWithdrawal.userEmail}</div>
             </div>
 
