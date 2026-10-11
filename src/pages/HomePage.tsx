@@ -80,66 +80,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   return (
     <div className="space-y-12">
       
-      {/* 1. COMPACT HERO SECTION */}
-      <section className="relative isolate overflow-hidden rounded-3xl border border-slate-800/80 bg-gradient-to-br from-[#0d142b] via-[#090d1a] to-[#071b20] px-4 py-6 sm:px-7 sm:py-8 shadow-xl">
-        <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -left-12 h-56 w-56 rounded-full bg-cyan-500/10 blur-3xl" />
-
-        <div className="relative mx-auto max-w-5xl space-y-5">
-          <div className="flex justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-300">
-              <ShieldCheck className="h-4 w-4" />
-              <span>Official Bangladesh Earning Platform</span>
-            </div>
-          </div>
-
-          {/* Action CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <button
-              onClick={() => {
-                const el = document.getElementById('directory-section');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-xl shadow-emerald-500/25 flex items-center gap-2 transition active:scale-95"
-            >
-              <span>View Ad</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => {
-                if (!currentUser) onOpenAuth();
-                else onNavigateTab('dashboard');
-              }}
-              className="px-6 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-bold text-sm flex items-center gap-2 transition"
-            >
-              <Wallet className="w-4 h-4 text-emerald-400" />
-              <span>{t('viewDashboard')}</span>
-            </button>
-          </div>
-
-          {/* Value Props Pills */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 max-w-4xl mx-auto text-left">
-            <div className="bg-slate-900/70 border border-slate-800/90 p-3 sm:p-4 rounded-2xl transition-colors hover:border-slate-700">
-              <div className="text-[11px] text-slate-400 font-medium">Min Threshold</div>
-              <div className="text-base sm:text-lg font-black text-white">৳3,000 BDT</div>
-            </div>
-            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-              <div className="text-[11px] text-slate-400 font-medium">Payment Wallets</div>
-              <div className="text-base sm:text-lg font-black text-pink-400">bKash & Nagad</div>
-            </div>
-            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-              <div className="text-[11px] text-slate-400 font-medium">Carryover</div>
-              <div className="text-base sm:text-lg font-black text-emerald-400">100% Rollover</div>
-            </div>
-            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl">
-              <div className="text-[11px] text-slate-400 font-medium">Ad Networks</div>
-              <div className="text-base sm:text-lg font-black text-cyan-400">Ad Network Compliant</div>
-            </div>
-          </div>
-
-        </div>
-      </section>
+      {/* Hero section removed as requested; keep the remaining sections aligned. */}
 
       {/* Official Telegram Channel */}
       <section className="relative overflow-hidden rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-950/80 via-slate-900 to-blue-950/70 p-5 sm:p-6 shadow-lg">
