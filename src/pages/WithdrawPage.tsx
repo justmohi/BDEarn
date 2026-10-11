@@ -256,7 +256,7 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
               </div>
 
               <div className="flex gap-2 mt-2">
-                {[3000, 5000, 10000, 15000].map(val => (
+                {[3000, 6000, 10000, 15000].map(val => (
                   <button
                     key={val}
                     type="button"
