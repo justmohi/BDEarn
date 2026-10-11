@@ -14,6 +14,7 @@ export async function handler(event: any) {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
@@ -29,8 +30,9 @@ export async function handler(event: any) {
       };
     }
 
-    const phoneRegex = /^01[3-9]\d{8}$/;
-    if (!walletNumber || !phoneRegex.test(String(walletNumber).replace(/[\s-]/g, ''))) {
+    const normalizedWalletNumber = String(walletNumber || '').replace(/[\\s-]/g, '');
+    const phoneRegex = /^01[3-9]\\d{8}$/;
+    if (!phoneRegex.test(normalizedWalletNumber)) {
       return {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -39,11 +41,11 @@ export async function handler(event: any) {
     }
 
     const numAmount = Number(amount);
-    if (isNaN(numAmount) || numAmount < 5000) {
+    if (!Number.isSafeInteger(numAmount) || numAmount < 3000) {
       return {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Minimum withdrawal amount is BDT 5,000.' })
+        body: JSON.stringify({ error: 'Minimum withdrawal amount is BDT 3,000, using whole-number amounts only.' })
       };
     }
 
@@ -62,14 +64,14 @@ export async function handler(event: any) {
         valid: true,
         amount: numAmount,
         walletType,
-        walletNumber
+        walletNumber: normalizedWalletNumber
       })
     };
-  } catch (err: any) {
+  } catch {
     return {
-      statusCode: 500,
+      statusCode: 400,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: err.message || 'Internal error' })
+      body: JSON.stringify({ error: 'Invalid request body.' })
     };
   }
 }
