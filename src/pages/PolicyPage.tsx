@@ -113,7 +113,7 @@ export const PolicyPage: React.FC<PolicyPageProps> = ({ initialSection = 'adPoli
           <div>
             <h3 className="text-base font-bold text-white mb-2">1. Minimum Withdrawal Threshold</h3>
             <p>
-              The minimum payout threshold is strictly BDT 5,000 (৳5,000). A publisher's approved, available balance must be equal to or greater than ৳5,000 to initiate a withdrawal. Unpaid approved amounts roll over indefinitely into subsequent calendar months.
+              The minimum payout threshold is strictly BDT 3,000 (৳3,000). A publisher's approved, available balance must be equal to or greater than ৳3,000 to initiate a withdrawal. Unpaid approved amounts roll over indefinitely into subsequent calendar months.
             </p>
           </div>
 
