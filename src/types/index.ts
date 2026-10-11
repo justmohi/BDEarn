@@ -54,7 +54,7 @@ export interface AdCard {
 }
 
 export type WithdrawalStatus = 'pending' | 'processing' | 'approved' | 'paid' | 'rejected';
-export type WalletType = 'bKash' | 'Nagad';
+export type WalletType = 'bKash' | 'Nagad' | 'Binance';
 
 export interface WithdrawalRequest {
   id: string;
