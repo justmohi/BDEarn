@@ -76,7 +76,7 @@ The application uses `firebase-applet-config.json` generated during Firebase pro
 Configure these in **Netlify → Site configuration → Environment variables**; do not commit private credentials to GitHub:
 
 - `FIREBASE_SERVICE_ACCOUNT_JSON`: the complete Firebase service-account JSON for the same Firebase project used by this app. Keep it private.
-- `FIRESTORE_DATABASE_ID`: the exact named Firestore database ID from `firebase-applet-config.json`.
+- `FIRESTORE_DATABASE_ID` (optional): set this only if the app uses a non-default Firestore database. Leave it unset when using the project's `(default)` database; do not use an ID from the old Firebase project.
 - `URL`: your deployed site's origin, if you need to customize the function's CORS origin.
 
 The referral function uses Firebase Admin SDK to verify Firebase ID tokens and to perform trusted Firestore transactions. Without the service-account environment variable, referral claims and admin reviews will return a configuration error. After setting the variables, redeploy the site.
