@@ -1,12 +1,8 @@
 {
-  "projectId": "premium-flash",
-  "appId": "1:1085420561189:web:6e852df61272e2a27ff0cc",
-  "apiKey": "AIzaSyC5OOYpJv06xreikw1aOqUBA8Swgh62R30",
-  "authDomain": "premium-flash.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-earnbdbangladesh-49ddc5c8-992d-440b-8394-311184dab3b1",
-  "storageBucket": "premium-flash.firebasestorage.app",
-  "messagingSenderId": "1085420561189",
-  "measurementId": "",
-  "oAuthClientId": "1085420561189-ibm5om4m0n5drsu4vbiet0k454bldmns.apps.googleusercontent.com",
-  "recaptchaSiteKey": ""
+  "apiKey": "AIzaSyBoaPpVxad0W_HQIuFvbt5trj6lOnmIVHA",
+  "authDomain": "earnbdviewad.firebaseapp.com",
+  "projectId": "earnbdviewad",
+  "storageBucket": "earnbdviewad.firebasestorage.app",
+  "messagingSenderId": "1004749791780",
+  "appId": "1:1004749791780:web:7da45dccccbc059fb76eb1"
 }
