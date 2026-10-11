@@ -23,7 +23,7 @@ export const translations = {
     
     // Header & Hero
     heroTitle: 'Earn Transparent Publisher Revenue in Bangladesh',
-    heroSubtitle: 'Direct, verified ad & sponsorship revenue sharing with secure manual bKash & Nagad withdrawals at ৳5,000 threshold.',
+    heroSubtitle: 'Direct, verified ad & sponsorship revenue sharing with secure manual bKash & Nagad withdrawals at ৳3,000 threshold.',
     startBrowsing: 'Explore Ad Directory',
     viewDashboard: 'Go to Dashboard',
     
@@ -53,9 +53,9 @@ export const translations = {
     currentMonthEarnings: "This Month's Approved",
     previousMonthEarnings: "Previous Month's Carryover",
     withdrawalGoalTitle: 'Minimum Withdrawal Requirement',
-    minWithdrawalNotice: 'Minimum withdrawal amount is ৳5,000. Unpaid approved balances carry forward seamlessly every month.',
+    minWithdrawalNotice: 'Minimum withdrawal amount is ৳3,000. Unpaid approved balances carry forward seamlessly every month.',
     eligibleToWithdraw: 'You are eligible to request a withdrawal!',
-    needMoreToWithdraw: 'You need ৳{remaining} more to reach the ৳5,000 withdrawal threshold.',
+    needMoreToWithdraw: 'You need ৳{remaining} more to reach the ৳3,000 withdrawal threshold.',
     submitWithdrawalBtn: 'Request Payout Now',
     withdrawalHistory: 'Withdrawal History',
     transactionHistory: 'Transaction Ledger',
@@ -71,7 +71,7 @@ export const translations = {
     walletNumberHelp: 'Enter 11-digit Bangladesh mobile number (e.g., 01712345678)',
     amountToWithdraw: 'Withdrawal Amount (BDT)',
     availableFunds: 'Available Withdrawable: ৳{amount}',
-    minWithdrawalRule: 'Minimum: ৳5,000 BDT',
+    minWithdrawalRule: 'Minimum: ৳3,000 BDT',
     maxWithdrawable: 'Max Available',
     pinWarningTitle: 'Security Protection Notice',
     pinWarningText: 'EarnBD will NEVER ask for your bKash or Nagad PIN, OTP, or secret password. Keep your mobile wallet safe.',
@@ -79,9 +79,9 @@ export const translations = {
     confirmSummary: 'Please verify the wallet number and payout amount before submitting.',
     confirmAndSubmit: 'Confirm & Submit Request',
     submitting: 'Submitting...',
-    insufficientBalance: 'Your available balance is less than ৳5,000.',
+    insufficientBalance: 'Your available balance is less than ৳3,000.',
     invalidPhone: 'Please enter a valid 11-digit Bangladeshi mobile number.',
-    invalidAmount: 'Amount must be at least ৳5,000 and not exceed your available balance.',
+    invalidAmount: 'Amount must be at least ৳3,000 and not exceed your available balance.',
     requestSuccess: 'Withdrawal request submitted successfully! Your funds are reserved while processing.',
 
     // Statuses
@@ -156,7 +156,7 @@ export const translations = {
 
     // Header & Hero
     heroTitle: 'বাংলাদেশে বিশ্বস্ত প্রকাশকের রাজস্ব আয়ের প্ল্যাটফর্ম',
-    heroSubtitle: 'যাচাইকৃত স্পনসরশিপ ও বিজ্ঞাপন রাজস্বের অংশীদারিত্ব। বিকাশ ও নগদ এর মাধ্যমে ন্যূনতম ৫,০০০ ৳ উত্তোলনের নিশ্চয়তা।',
+    heroSubtitle: 'যাচাইকৃত স্পনসরশিপ ও বিজ্ঞাপন রাজস্বের অংশীদারিত্ব। বিকাশ ও নগদ এর মাধ্যমে ন্যূনতম ৩,০০০ ৳ উত্তোলনের নিশ্চয়তা।',
     startBrowsing: 'বিজ্ঞাপন ডিরেক্টরি দেখুন',
     viewDashboard: 'ড্যাশবোর্ডে যান',
 
@@ -186,9 +186,9 @@ export const translations = {
     currentMonthEarnings: 'চলতি মাসের আয়',
     previousMonthEarnings: 'পূর্ববর্তী মাসের ব্যালেন্স',
     withdrawalGoalTitle: 'ন্যূনতম উত্তোলনের শর্ত',
-    minWithdrawalNotice: 'উত্তোলনের ন্যূনতম পরিমাণ ৫,০০০ ৳। অপরিশোধিত ব্যালেন্স পরবর্তী মাসে যোগ হবে।',
+    minWithdrawalNotice: 'উত্তোলনের ন্যূনতম পরিমাণ ৩,০০০ ৳। অপরিশোধিত ব্যালেন্স পরবর্তী মাসে যোগ হবে।',
     eligibleToWithdraw: 'আপনি উত্তোলনের যোগ্য!',
-    needMoreToWithdraw: '৫,০০০ ৳ লক্ষ্যের জন্য আরও ৳{remaining} প্রয়োজন।',
+    needMoreToWithdraw: '৩,০০০ ৳ লক্ষ্যের জন্য আরও ৳{remaining} প্রয়োজন।',
     submitWithdrawalBtn: 'উত্তোলনের অনুরোধ করুন',
     withdrawalHistory: 'উত্তোলন বিবরণী',
     transactionHistory: 'লেনদেনের হিস্ট্রি',
@@ -204,7 +204,7 @@ export const translations = {
     walletNumberHelp: '১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর লিখুন (যেমন: 01712345678)',
     amountToWithdraw: 'উত্তোলনের পরিমাণ (টাকা)',
     availableFunds: 'উত্তোলনযোগ্য ব্যালেন্স: ৳{amount}',
-    minWithdrawalRule: 'ন্যূনতম: ৫,০০০ ৳',
+    minWithdrawalRule: 'ন্যূনতম: ৩,০০০ ৳',
     maxWithdrawable: 'সর্বোচ্চ ব্যালেন্স',
     pinWarningTitle: 'নিরাপত্তা সতর্কতা',
     pinWarningText: 'EarnBD কখনোই আপনার বিকাশ বা নগদ পিন (PIN), ওটিপি (OTP) বা পাসওয়ার্ড চাইবে না। নিজের অ্যাকাউন্ট সুরক্ষিত রাখুন।',
@@ -212,9 +212,9 @@ export const translations = {
     confirmSummary: 'জমা দেওয়ার আগে ওয়ালেট নম্বর ও টাকার পরিমাণ ভালোভাবে চেক করে নিন।',
     confirmAndSubmit: 'নিশ্চিত করুন ও জমা দিন',
     submitting: 'প্রক্রিয়াধীন...',
-    insufficientBalance: 'আপনার ব্যালেন্স ৫,০০০ টাকার কম।',
+    insufficientBalance: 'আপনার ব্যালেন্স ৩,০০০ টাকার কম।',
     invalidPhone: 'সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন।',
-    invalidAmount: 'পরিমাণ কমপক্ষে ৫,০০০ ৳ হতে হবে এবং ব্যালেন্সের বেশি হওয়া যাবে না।',
+    invalidAmount: 'পরিমাণ কমপক্ষে ৩,০০০ ৳ হতে হবে এবং ব্যালেন্সের বেশি হওয়া যাবে না।',
     requestSuccess: 'উত্তোলনের আবেদন সফল হয়েছে! টাকা প্রক্রিয়াকরণের জন্য রিজার্ভ করা হয়েছে।',
 
     // Statuses
