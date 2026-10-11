@@ -199,6 +199,23 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
                   </div>
                 </div>
 
+                <div
+                  onClick={() => setWalletType('Binance')}
+                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-center gap-3.5 ${
+                    walletType === 'Binance'
+                      ? 'bg-yellow-950/40 border-yellow-400 shadow-lg shadow-yellow-950/30'
+                      : 'bg-slate-950 border-slate-800 hover:border-slate-700'
+                  }`}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-[#f0b90b] flex items-center justify-center font-black text-slate-950 text-sm">
+                    B
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-white">Binance Payout</div>
+                    <div className="text-xs text-slate-400">Binance UID (Manual)</div>
+                  </div>
+                </div>
+
               </div>
             </div>
 
@@ -219,7 +236,7 @@ export const WithdrawPage: React.FC<WithdrawPageProps> = ({
                   required
                 />
                 <span className="absolute right-4 top-3.5 text-xs text-slate-500 font-mono">
-                  11 digits
+                  {walletType === 'Binance' ? '6–20 digits' : '11 digits'}
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-1">
