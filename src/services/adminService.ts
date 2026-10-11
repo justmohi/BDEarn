@@ -110,7 +110,7 @@ export async function fetchAppSettings(): Promise<AppSettings> {
     console.warn('Could not fetch appSettings, using defaults:', err);
   }
   return {
-    minWithdrawalAmount: 5000,
+    minWithdrawalAmount: 3000,
     commissionPercentage: 65,
     allowWithdrawals: true,
     noticeEn: 'EarnBD is fully compliant with publisher terms.',
